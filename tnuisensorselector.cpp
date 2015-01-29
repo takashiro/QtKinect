@@ -179,7 +179,7 @@ bool TNuiSensorSelector::isCurrentSensorValid() const
 
 TNuiSensorSelector::ChangeFlag TNuiSensorSelector::tryFindRequiredNuiSensor()
 {
-    Q_ASSERT(!m_requiredSensorId.empty());
+    Q_ASSERT(!m_requiredSensorId.isEmpty());
 
     INuiSensor *nuiSensor = nullptr;
     HRESULT hr = NuiCreateSensorById(WindowsUtil::ToOLECharArray(m_requiredSensorId), &nuiSensor);
@@ -196,7 +196,7 @@ TNuiSensorSelector::ChangeFlag TNuiSensorSelector::tryFindRequiredNuiSensor()
 
 TNuiSensorSelector::ChangeFlag TNuiSensorSelector::tryFindAnyOneNuiSensor()
 {
-    Q_ASSERT(m_requiredSensorId.empty());
+    Q_ASSERT(m_requiredSensorId.isEmpty());
 
     QList<INuiSensor *> sensors;
 
