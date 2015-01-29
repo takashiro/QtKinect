@@ -3,8 +3,6 @@
 #include <QPainter>
 #include <QTimer>
 
-#include <QDebug>
-
 TVideo::TVideo(QQuickItem *parent)
     : QQuickPaintedItem(parent), m_frame("ui/image/default-background.jpg")
 {
