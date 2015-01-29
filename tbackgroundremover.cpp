@@ -3,6 +3,8 @@
 
 #include <stdafx.h>
 
+#include <QImage>
+
 #define WM_SENSORCHANGED WM_USER + 1
 
 #ifndef HINST_THISCOMPONENT
@@ -10,7 +12,8 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 #define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
 #endif
 
-TBackgroundRemover::TBackgroundRemover() :
+TBackgroundRemover::TBackgroundRemover(QObject *parent) :
+    QThread(parent),
     m_depthStreamHandle(INVALID_HANDLE_VALUE),
     m_colorStreamHandle(INVALID_HANDLE_VALUE),
     m_nearMode(false),
@@ -57,6 +60,9 @@ TBackgroundRemover::TBackgroundRemover() :
     // Create the stream that does background removal and player segmentation
     if(!createBackgroundRemovedColorStream())
         emit toastMessage("Create background removal stream failed.");
+
+    setBackground("ui/image/default-background.jpg");
+    start();
 }
 
 TBackgroundRemover::~TBackgroundRemover()
@@ -73,9 +79,28 @@ TBackgroundRemover::~TBackgroundRemover()
     SafeCloseHandle(m_nextDepthFrameEvent);
     SafeCloseHandle(m_nextSkeletonFrameEvent);
 
-    SafeRelease(m_pD2DFactory);
     SafeRelease(m_nuiSensor);
     SafeRelease(m_backgroundRemovalStream);
+}
+
+void TBackgroundRemover::setBackground(const QString &filePath)
+{
+    QImage image(filePath);
+    image = image.convertToFormat(QImage::Format_RGBA8888);
+
+    int index = 0;
+    for (int i = 0; i < 640; i++) {
+        for (int j = 0; j < 480; j++) {
+            QRgb color = image.pixel(i, j);
+            m_backgroundRGBX[index + 3] = color & 0xFF;
+            color >>= 8;
+            m_backgroundRGBX[index] = color & 0xFF;
+            color >>= 8;
+            m_backgroundRGBX[index + 1] = color & 0xFF;
+            color >>= 8;
+            m_backgroundRGBX[index + 2] = color & 0xFF;
+        }
+    }
 }
 
 // Create the first connected Kinect found
@@ -278,21 +303,18 @@ bool TBackgroundRemover::composeImage()
         return false;
     }
 
-    const uchar *pBackgroundRemovedColor = bgRemovedFrame.pBackgroundRemovedColorData;
+    const uchar *backgroundRemovedColor = bgRemovedFrame.pBackgroundRemovedColorData;
 
     int dataLength = static_cast<int>(m_colorWidth) * static_cast<int>(m_colorHeight) * BYTES_PER_PIXEL;
     uchar alpha = 0;
     const int alphaChannelBytePosition = 3;
-    for (int i = 0; i < dataLength; ++i)
-    {
+    for (int i = 0; i < dataLength; i++) {
         if (i % BYTES_PER_PIXEL == 0) {
-            alpha = pBackgroundRemovedColor[i + alphaChannelBytePosition];
+            alpha = backgroundRemovedColor[i + alphaChannelBytePosition];
         }
 
         if (i % BYTES_PER_PIXEL != alphaChannelBytePosition) {
-            m_outputRGBX[i] = static_cast<uchar>(
-                ( (UCHAR_MAX - alpha) * m_backgroundRGBX[i] + alpha * pBackgroundRemovedColor[i] ) / UCHAR_MAX
-                );
+            m_outputRGBX[i] = static_cast<uchar>(((UCHAR_MAX - alpha) * m_backgroundRGBX[i] + alpha * backgroundRemovedColor[i]) / UCHAR_MAX);
         }
     }
 
@@ -302,8 +324,21 @@ bool TBackgroundRemover::composeImage()
         return false;
     }
 
-
-    emit newFrame(m_outputRGBX, m_colorWidth * m_colorHeight * BYTES_PER_PIXEL);
+    //@todo: Well, isn't it RGBX? I see nothing but black.
+    QImage frame(m_colorWidth, m_colorHeight, QImage::Format_RGBX8888);
+    uchar *pixel = m_outputRGBX;
+    for (uint i = 0; i < m_colorWidth; i++) {
+        for (uint j = 0; j < m_colorHeight; j++) {
+            uint rgb = 0;
+            for (int k = 0; k < BYTES_PER_PIXEL; k++) {
+                rgb = *pixel;
+                rgb <<= 8;
+                pixel++;
+            }
+            frame.setPixel(i, j, rgb);
+        }
+    }
+    emit newFrame(frame);
 
     return true;
 }
@@ -383,5 +418,47 @@ void TBackgroundRemover::StatusChangeCallback(HRESULT, const OLECHAR *, const OL
         // Handle sensor status change event
         TNuiSensorSelector::ChangeFlag flag = remover->m_sensorSelector->onNuiStatusChanged();
         remover->updateSensorAndStatus(flag);
+    }
+}
+
+void TBackgroundRemover::run()
+{
+    const HANDLE hEvents[] = {m_nextDepthFrameEvent, m_nextColorFrameEvent, m_nextSkeletonFrameEvent, m_nextBackgroundRemovedFrameEvent};
+    MSG msg = {0};
+
+    // Main message loop
+    while (WM_QUIT != msg.message)
+    {
+        // Check to see if we have either a message (by passing in QS_ALLINPUT)
+        // Or a Kinect event (hEvents)
+        // Update() will check for Kinect events individually, in case more than one are signaled
+        MsgWaitForMultipleObjects(_countof(hEvents), hEvents, FALSE, INFINITE, QS_ALLINPUT);
+
+        // Individually check the Kinect stream events since MsgWaitForMultipleObjects
+        // can return for other reasons even though these are signaled.
+        if (nullptr == m_nuiSensor) {
+            return;
+        }
+
+        if (WAIT_OBJECT_0 == WaitForSingleObject(m_nextBackgroundRemovedFrameEvent, 0)) {
+            composeImage();
+        }
+
+        if ( WAIT_OBJECT_0 == WaitForSingleObject(m_nextDepthFrameEvent, 0) ) {
+            processDepth();
+        }
+
+        if ( WAIT_OBJECT_0 == WaitForSingleObject(m_nextColorFrameEvent, 0) ) {
+            processColor();
+        }
+
+        if (WAIT_OBJECT_0 == WaitForSingleObject(m_nextSkeletonFrameEvent, 0) ) {
+            processSkeleton();
+        }
+
+        while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
     }
 }

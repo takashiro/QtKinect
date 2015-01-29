@@ -4,7 +4,7 @@
 
 #include "tnuisensorselector.h"
 
-#include <QObject>
+#include <QThread>
 
 #include <Windows.h>
 #include <NuiApi.h>
@@ -13,7 +13,7 @@
 
 struct INuiSensor;
 
-class TBackgroundRemover : public QObject
+class TBackgroundRemover : public QThread
 {
     Q_OBJECT
 
@@ -27,41 +27,17 @@ class TBackgroundRemover : public QObject
     static const int STATUS_MESSAGE_MAX_LENGTH = MAX_PATH*2;
 
 public:
-    TBackgroundRemover();
+    TBackgroundRemover(QObject *parent = 0);
     ~TBackgroundRemover();
 
-    /// <summary>
-    /// Handles window messages, passes most to the class instance to handle
-    /// </summary>
-    /// <param name="hWnd">window message is for</param>
-    /// <param name="uMsg">message</param>
-    /// <param name="wParam">message data</param>
-    /// <param name="lParam">additional message data</param>
-    /// <returns>result of message processing</returns>
-    static LRESULT CALLBACK MessageRouter(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    void setBackground(const QString &filePath);
 
-    /// <summary>
-    /// Handle windows messages for a class instance
-    /// </summary>
-    /// <param name="hWnd">window message is for</param>
-    /// <param name="uMsg">message</param>
-    /// <param name="wParam">message data</param>
-    /// <param name="lParam">additional message data</param>
-    /// <returns>result of message processing</returns>
-    LRESULT CALLBACK        DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
-    /// <summary>
-    /// Creates the main window and begins processing
-    /// </summary>
-    /// <param name="hInstance"></param>
-    /// <param name="nCmdShow"></param>
-    int                     Run(HINSTANCE hInstance, int nCmdShow);
-
-    /// <summary>
-    /// Called on Kinect device status changed. It will update the sensor chooser UI control
-    /// based on the new sensor status. It may also updates the sensor instance if needed
-    /// </summary>
+    // Called on Kinect device status changed. It will update the sensor chooser UI control
+    // based on the new sensor status. It may also updates the sensor instance if needed
     static void CALLBACK StatusChangeCallback(HRESULT, const OLECHAR*, const OLECHAR*, void* userData);
+
+protected:
+    void run();
 
 private:
     HWND m_hWnd;
@@ -69,9 +45,6 @@ private:
 
     // Current Kinect
     INuiSensor *m_nuiSensor;
-
-    // Direct2D
-    ID2D1Factory* m_pD2DFactory;
 
     HANDLE m_depthStreamHandle;
     HANDLE m_nextDepthFrameEvent;
@@ -138,7 +111,7 @@ private:
 
 signals:
     void toastMessage(const QString &message);
-    void newFrame(const uchar *frame, uint length);
+    void newFrame(const QImage &frame);
     void statusChanged(ulong status);
 };
 
