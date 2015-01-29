@@ -88,7 +88,7 @@ TNuiSensorSelector::ChangeFlag TNuiSensorSelector::onNuiStatusChanged()
     return tryFindNuiSensor();
 }
 
-INuiSensor *TNuiSensorSelector::getSensor(quint32 flags)
+INuiSensor *TNuiSensorSelector::getSensor(ulong flags)
 {
     if (nullptr == m_nuiSensor)
     {
@@ -116,7 +116,7 @@ INuiSensor *TNuiSensorSelector::getSensor(quint32 flags)
     return m_nuiSensor;
 }
 
-quint32 TNuiSensorSelector::getStatus() const
+ulong TNuiSensorSelector::getStatus() const
 {
     return m_latestStatus;
 }
@@ -225,7 +225,7 @@ TNuiSensorSelector::ChangeFlag TNuiSensorSelector::selectSensorFromCollection(co
     // The status bits are used to save all the error status collected from each sensor.
     // At first, we mark the error bits as NoAvailableSensors if the sensor collection is empty,
     // or just set to None.
-    quint32 statusBits = sensors.size() == 0 ? NoAvailableSensorsStatus : NoneStatus;
+    ulong statusBits = sensors.size() == 0 ? NoAvailableSensorsStatus : NoneStatus;
     INuiSensor *validSensor = nullptr;
 
     foreach (INuiSensor *sensor, sensors) {
@@ -262,7 +262,7 @@ TNuiSensorSelector::ChangeFlag TNuiSensorSelector::selectSensorFromCollection(co
     return updateSensorAndStatus(validSensor, statusBits);
 }
 
-TNuiSensorSelector::ChangeFlag TNuiSensorSelector::updateSensorAndStatus(INuiSensor* nuiSensor, const quint32 newStatus)
+TNuiSensorSelector::ChangeFlag TNuiSensorSelector::updateSensorAndStatus(INuiSensor* nuiSensor, const ulong newStatus)
 {
     ChangeFlag changedFlags = NoneChangedFlag;
 

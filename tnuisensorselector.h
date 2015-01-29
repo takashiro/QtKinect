@@ -1,7 +1,6 @@
 #ifndef NUISENSORSELECTOR_H
 #define NUISENSORSELECTOR_H
 
-#include <QObject>
 #include <QString>
 #include <QList>
 
@@ -59,14 +58,14 @@ public:
 
     // Get the current connected Nui sensor.
     // dwFlags: The flags to initialize the returned sensor.
-    INuiSensor *getSensor(quint32 flags);
+    INuiSensor *getSensor(ulong flags);
 
     // Clients should call this method to resolve the conflicts or find a new sensor when current
     // sensor status is SensorConflict.
     ChangeFlag tryResolveConflict();
 
     // Retrieve the status of the current connected sensor or the reason why we cannot get a sensor.
-    quint32 getStatus() const;
+    ulong getStatus() const;
 
     // The NuiSensorChooser will try to find and connect to the sensor specified by this method.
     // strRequiredSensorId: The id string of the sensor which users want to connect. NULL means anyone is Ok.
@@ -107,7 +106,7 @@ private:
     /// The status of the new selected sensor
     /// </param>
     /// <returns>The device change type</returns>
-    ChangeFlag updateSensorAndStatus(INuiSensor *nuiSensor, const quint32 newStatus);
+    ChangeFlag updateSensorAndStatus(INuiSensor *nuiSensor, const ulong newStatus);
 
     /// Helper to update the required sensor id
 
@@ -134,7 +133,7 @@ private:
 private:
     INuiSensor *m_nuiSensor;
     bool m_isSensorInitialized;
-    quint32 m_latestStatus;
+    ulong m_latestStatus;
     QString m_requiredSensorId;
 };
 
