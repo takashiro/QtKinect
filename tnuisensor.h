@@ -64,12 +64,14 @@ public:
     //Gets the zero-based sensor index.
     int instanceIndex() const {return m_sensor->NuiInstanceIndex();}
 
+    //Gets the Kinect sensor connection ID.
+    QString deviceConnectionId() const {return m_deviceConnectionId;}
+
     /*
         NuiAccelerometerGetCurrentReading	Gets the accelerometer reading.
         NuiAudioArrayId	Gets the USB device name of the audio array.
         NuiCameraElevationGetAngle	Gets the elevation (tilt angle) whose range is [+/-27] degrees.
         NuiCameraElevationSetAngle	Sets the elevation (tilt angle) whose range is [+/-27] degrees.
-        NuiDeviceConnectionId	Gets the Kinect sensor connection ID.
         NuiGetAudioSource	Gets the audio source.
         NuiGetColorCameraSettings	Gets the color camera settings.
         NuiGetCoordinateMapper	Gets the coordinate mapping settings.
@@ -108,6 +110,7 @@ private:
     void _onStateChanged(State state);
 
     INuiSensor *m_sensor;
+    QString m_deviceConnectionId;
 };
 
 #endif // TNUISENSOR_H

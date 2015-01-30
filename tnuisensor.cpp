@@ -9,7 +9,7 @@ TNuiSensor::TNuiSensor(INuiSensor *sensor, QObject *parent)
     , m_sensor(sensor)
 {
     m_sensor->AddRef();
-
+    m_deviceConnectionId = WindowsUtil::toString(m_sensor->NuiDeviceConnectionId());
     connect(this, &TNuiSensor::stateChanged, this, &TNuiSensor::_onStateChanged);
 }
 
