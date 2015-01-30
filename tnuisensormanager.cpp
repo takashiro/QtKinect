@@ -1,33 +1,39 @@
 #include "tnuisensormanager.h"
 #include "tnuisensor.h"
 #include "windowsutil.h"
+#include "stdafx.h"
 
 #include <QCoreApplication>
 
 TNuiSensorManager *SensorManager = TNuiSensorManager::instance();
 
-void CALLBACK TNuiSensorManager::ChangeStatusCallback(HRESULT hrStatus, const OLECHAR *winInstanceName, const OLECHAR *, void *userData)
+void CALLBACK TNuiSensorManager::ChangeStatusCallback(HRESULT hrStatus, const OLECHAR *instanceName, const OLECHAR *, void *userData)
 {
     TNuiSensorManager *manager = reinterpret_cast<TNuiSensorManager *>(userData);
-    QString instanceName = WindowsUtil::toString(winInstanceName);
-    TNuiSensor *sensor = manager->m_sensors.value(instanceName, nullptr);
-
     if (SUCCEEDED(hrStatus)) {
-        if (sensor == nullptr) {
-            INuiSensor *pNuiSensor = nullptr;
-            if (SUCCEEDED(NuiCreateSensorById(winInstanceName, &pNuiSensor))) {
-                sensor = new TNuiSensor(pNuiSensor);
-                manager->m_sensors.insert(instanceName, sensor);
-                manager->newSensorConnected(sensor);
+        foreach (TNuiSensor *sensor, manager->m_sensors) {
+            if (sensor->deviceConnectionId() != WindowsUtil::toString(instanceName))
+                continue;
+
+            if (sensor == nullptr) {
+                //Insert a new TNuiSensor
+                INuiSensor *pNuiSensor = nullptr;
+                if (SUCCEEDED(NuiCreateSensorById(instanceName, &pNuiSensor))) {
+                    sensor = manager->_addSensor(pNuiSensor);
+                }
+                pNuiSensor->Release();
+            } else {
+                //Simply update the state
+                sensor->_updateState();
             }
-            pNuiSensor->Release();
-        } else {
-            sensor->_updateState();
+            break;
         }
     } else {
-        if (sensor != nullptr) {
-            manager->m_sensors.remove(instanceName);
-            delete sensor;
+        foreach (TNuiSensor *sensor, manager->m_sensors) {
+            if (sensor->deviceConnectionId() != WindowsUtil::toString(instanceName))
+                continue;
+            sensor->_updateState();
+            break;
         }
     }
 }
@@ -35,6 +41,23 @@ void CALLBACK TNuiSensorManager::ChangeStatusCallback(HRESULT hrStatus, const OL
 TNuiSensorManager::TNuiSensorManager(QObject *parent)
     : QObject(parent)
 {
+    int iCount = 0;
+    HRESULT hr = NuiGetSensorCount(&iCount);
+    if (FAILED(hr)) {
+        qFatal("NuiGetSensorCount Failed.");
+        return;
+    }
+
+    for (int i = 0; i < iCount; ++i) {
+        INuiSensor* pNuiSensor = nullptr;
+
+        if (SUCCEEDED(NuiCreateSensorByIndex(i, &pNuiSensor))) {
+            _addSensor(pNuiSensor);
+        }
+
+        SafeRelease(pNuiSensor);
+    }
+
     NuiSetDeviceStatusCallback(ChangeStatusCallback, this);
 }
 
@@ -42,4 +65,19 @@ TNuiSensorManager *TNuiSensorManager::instance()
 {
     static TNuiSensorManager manager;
     return &manager;
+}
+
+TNuiSensorManager::~TNuiSensorManager()
+{
+    foreach (TNuiSensor *sensor, m_sensors) {
+        delete sensor;
+    }
+}
+
+TNuiSensor *TNuiSensorManager::_addSensor(INuiSensor *pNuiSensor)
+{
+    TNuiSensor *sensor = new TNuiSensor(pNuiSensor);
+    m_sensors << sensor;
+    emit newSensorConnected(sensor);
+    return sensor;
 }

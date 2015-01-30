@@ -27,6 +27,4 @@ namespace WindowsUtil {
     }
 }
 
-bool operator==(const QString &str1, const wchar_t *str2);
-
 #endif // WINDOWSUTIL_H

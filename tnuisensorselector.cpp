@@ -311,7 +311,7 @@ bool TNuiSensorSelector::isCurrentSensorRequired() const
     }
 
     // case sensitive comparison
-    return m_requiredSensorId == sensorId;
+    return m_requiredSensorId == WindowsUtil::toString(sensorId);
 }
 
 void TNuiSensorSelector::setRequiredId(const QString &requiredSensorId)
