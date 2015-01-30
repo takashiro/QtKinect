@@ -8,8 +8,13 @@
 
 class TNuiSensor : public QObject
 {
+    Q_OBJECT
+
 public:
+    friend class TNuiSensorManager;
+
     enum State{
+        ConnectedState = S_OK,
         //The device is connected, but still initializing.
         InitializingState = S_NUI_INITIALIZING,
         //The device is not connected.
@@ -95,7 +100,7 @@ signals:
     void disconnected();
 
 protected:
-    void _setState(State state);
+    void _updateState();
 
     State m_state;
 

@@ -18,16 +18,17 @@ TNuiSensor::~TNuiSensor()
     m_sensor->Release();
 }
 
-TNuiSensor::_onStateChanged(State state)
+void TNuiSensor::_onStateChanged(State state)
 {
     if (state == NotConnectedState)
         emit disconnected();
-    else
+    else if (state == ConnectedState)
         emit connected();
 }
 
-TNuiSensor::_setState(State state)
+void TNuiSensor::_updateState()
 {
+    State state = (State) m_sensor->NuiStatus();
     if (state != m_state) {
         m_state = state;
         emit stateChanged(state);
