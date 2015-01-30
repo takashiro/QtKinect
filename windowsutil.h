@@ -17,6 +17,14 @@ namespace WindowsUtil {
     #endif
     }
 
+    inline QString toString(const OLECHAR *str)
+    {
+#if defined(_WIN32) && !defined(OLE2ANSI)
+    return QString::fromWCharArray(str);
+#else
+    return QString::fromLocal8Bit(str);
+#endif
+    }
 }
 
 bool operator==(const QString &str1, const wchar_t *str2);

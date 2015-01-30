@@ -30,7 +30,8 @@ SOURCES += \
     $$PWD/view/tbackgroundremovedcamera.cpp \
     $$PWD/view/timage.cpp \
     $$PWD/view/tnuicolorcamera.cpp \
-    $$PWD/view/tnuiimage.cpp
+    $$PWD/view/tnuiimage.cpp \
+    $$PWD/tnuisensormanager.cpp
 
 HEADERS += \
     $$PWD/tnuisensorselector.h \
@@ -44,4 +45,5 @@ HEADERS += \
     $$PWD/view/tbackgroundremovedcamera.h \
     $$PWD/view/timage.h \
     $$PWD/view/tnuicolorcamera.h \
-    $$PWD/view/tnuiimage.h
+    $$PWD/view/tnuiimage.h \
+    $$PWD/tnuisensormanager.h
