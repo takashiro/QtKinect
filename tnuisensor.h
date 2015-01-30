@@ -7,7 +7,14 @@
 class TNuiSensor : public INuiSensor
 {
 public:
+    enum Status{
+
+    };
+
     TNuiSensor();
+
+signals:
+    statusChanged(Status status);
 };
 
 #endif // TNUISENSOR_H

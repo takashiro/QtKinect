@@ -1,6 +1,7 @@
 #ifndef TNUIIMAGEBUFFER_H
 #define TNUIIMAGEBUFFER_H
 
+#include <Windows.h>
 #include <NuiApi.h>
 
 #define MAX_PLAYER_INDEX    6

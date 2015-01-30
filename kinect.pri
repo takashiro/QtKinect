@@ -16,30 +16,32 @@ contains(QMAKE_HOST.arch, x86_64){
 LIBS += -lKinect10
 
 INCLUDEPATH += $$PWD
+INCLUDEPATH += $$PWD/model
+INCLUDEPATH += $$PWD/view
 
 SOURCES += \
     $$PWD/tnuisensorselector.cpp \
     $$PWD/tbackgroundremover.cpp \
     $$PWD/windowsutil.cpp \
-    $$PWD/tbackgroundremovedcamera.cpp \
     $$PWD/tnuicolorstream.cpp \
     $$PWD/tnuistream.cpp \
-    $$PWD/tnuiimagebuffer.cpp \
-    $$PWD/timage.cpp \
-    $$PWD/tnuiimage.cpp \
-    $$PWD/tnuicolorcamera.cpp \
-    $$PWD/tnuisensor.cpp
+    $$PWD/tnuisensor.cpp \
+    $$PWD/model/tnuiimagebuffer.cpp \
+    $$PWD/view/tbackgroundremovedcamera.cpp \
+    $$PWD/view/timage.cpp \
+    $$PWD/view/tnuicolorcamera.cpp \
+    $$PWD/view/tnuiimage.cpp
 
 HEADERS += \
     $$PWD/tnuisensorselector.h \
     $$PWD/tbackgroundremover.h \
     $$PWD/windowsutil.h \
     $$PWD/stdafx.h \
-    $$PWD/tbackgroundremovedcamera.h \
     $$PWD/tnuicolorstream.h \
     $$PWD/tnuistream.h \
-    $$PWD/tnuiimagebuffer.h \
-    $$PWD/timage.h \
-    $$PWD/tnuiimage.h \
-    $$PWD/tnuicolorcamera.h \
-    $$PWD/tnuisensor.h
+    $$PWD/tnuisensor.h \
+    $$PWD/model/tnuiimagebuffer.h \
+    $$PWD/view/tbackgroundremovedcamera.h \
+    $$PWD/view/timage.h \
+    $$PWD/view/tnuicolorcamera.h \
+    $$PWD/view/tnuiimage.h
