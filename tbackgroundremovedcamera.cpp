@@ -2,10 +2,10 @@
 #include "tbackgroundremover.h"
 
 TBackgroundRemovedCamera::TBackgroundRemovedCamera(QQuickItem *parent)
-    : TVideo(parent)
+    : TImage(parent)
 {
     m_remover = new TBackgroundRemover(this);
-    connect(m_remover, &TBackgroundRemover::newFrame, this, &TBackgroundRemovedCamera::setFrame);
+    connect(m_remover, &TBackgroundRemover::newFrame, this, &TBackgroundRemovedCamera::setImage);
 }
 
 class TBackgroundRemovedCameraAdder

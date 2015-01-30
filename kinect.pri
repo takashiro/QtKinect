@@ -21,13 +21,25 @@ SOURCES += \
     $$PWD/tnuisensorselector.cpp \
     $$PWD/tbackgroundremover.cpp \
     $$PWD/windowsutil.cpp \
-    $$PWD/tvideo.cpp \
-    $$PWD/tbackgroundremovedcamera.cpp
+    $$PWD/tbackgroundremovedcamera.cpp \
+    $$PWD/tnuicolorstream.cpp \
+    $$PWD/tnuistream.cpp \
+    $$PWD/tnuiimagebuffer.cpp \
+    $$PWD/timage.cpp \
+    $$PWD/tnuiimage.cpp \
+    $$PWD/tnuicolorcamera.cpp \
+    $$PWD/tnuisensor.cpp
 
 HEADERS += \
     $$PWD/tnuisensorselector.h \
     $$PWD/tbackgroundremover.h \
     $$PWD/windowsutil.h \
     $$PWD/stdafx.h \
-    $$PWD/tvideo.h \
-    $$PWD/tbackgroundremovedcamera.h
+    $$PWD/tbackgroundremovedcamera.h \
+    $$PWD/tnuicolorstream.h \
+    $$PWD/tnuistream.h \
+    $$PWD/tnuiimagebuffer.h \
+    $$PWD/timage.h \
+    $$PWD/tnuiimage.h \
+    $$PWD/tnuicolorcamera.h \
+    $$PWD/tnuisensor.h

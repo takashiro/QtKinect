@@ -1,11 +1,11 @@
 #ifndef TBACKGROUNDREMOVEDCAMERA_H
 #define TBACKGROUNDREMOVEDCAMERA_H
 
-#include "tvideo.h"
+#include "timage.h"
 
 class TBackgroundRemover;
 
-class TBackgroundRemovedCamera : public TVideo
+class TBackgroundRemovedCamera : public TImage
 {
 public:
     TBackgroundRemovedCamera(QQuickItem *parent = 0);
