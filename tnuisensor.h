@@ -68,8 +68,6 @@ public:
         NuiGetAudioSource	Gets the audio source.
         NuiGetColorCameraSettings	Gets the color camera settings.
         NuiGetCoordinateMapper	Gets the coordinate mapping settings.
-        NuiGetDepthFilter	Reserved for future use.
-        NuiGetDepthFilterForTimeStamp	Reserved for future use.
         NuiGetForceInfraredEmitterOff	Gets a boolean value that indicates whether the infrared emitter is disabled. The default is FALSE, that is, the emitter is NOT disabled.
         NuiImageFrameGetDepthImagePixelFrameTexture	Returns a pointer to an INuiFrameTexture that contains the data of a depth frame in NUI_DEPTH_IMAGE_PIXEL format (instead of packed USHORTs).
         NuiImageGetColorPixelCoordinateFrameFromDepthPixelFrameAtResolution	Gets the pixel coordinates in color space that correspond to the specified pixel coordinates in depth space, using the specified depth resolution.
@@ -80,7 +78,6 @@ public:
         NuiImageStreamOpen	Opens an image stream.
         NuiImageStreamReleaseFrame	Releases a frame of data.
         NuiImageStreamSetImageFrameFlags	Sets the image frame options.
-        NuiSetDepthFilter	Reserved for future use.
         NuiSetForceInfraredEmitterOff	Sets a value indicating whether the infrared emitter is disabled. The default value is false, which means that the infrared sensor is enabled (that is, not disabled).
         NuiSetFrameEndEvent	Sets the event that signals the last frame.
         NuiSkeletonGetNextFrame	Gets the next frame of data from the skeleton stream.
@@ -94,11 +91,17 @@ public:
 
 signals:
     void stateChanged(State state);
+    void connected();
+    void disconnected();
 
 protected:
+    void _setState(State state);
+
     State m_state;
 
 private:
+    void _onStateChanged(State state);
+
     INuiSensor *m_sensor;
 };
 
