@@ -1,8 +1,51 @@
 #include "tnuicolorcamera.h"
+#include "tnuisensor.h"
 #include "tnuicolorstream.h"
+#include "tnuisensormanager.h"
 
 TNuiColorCamera::TNuiColorCamera(QQuickItem *parent)
-    :TNuiImage(parent)
+    : TImage(parent)
 {
+    TNuiSensor *sensor = SensorManager->sensor();
+    sensor->initialize(TNuiSensor::UseColorFlag);
 
+    m_stream = new TNuiColorStream(sensor);
+    connect(sensor, &TNuiSensor::stateChanged, this, &TNuiColorCamera::tryOpenStream);
+    tryOpenStream();
 }
+
+void TNuiColorCamera::tryOpenStream()
+{
+    if (m_stream->open()) {
+        disconnect(m_stream->sensor(), &TNuiSensor::stateChanged, this, &TNuiColorCamera::tryOpenStream);
+        m_stream->start();
+        connect(m_stream, &TNuiStream::readyRead, this, &TNuiColorCamera::updateFrame);
+    }
+}
+
+void TNuiColorCamera::updateFrame()
+{
+    int color;
+    uchar *rgba = reinterpret_cast<uchar *>(&color);
+    QVector<uchar> data = m_stream->data();
+    int k = 0;
+    for (int j = 0; j < 480; j++) {
+        for (int i = 0; i < 640; i++) {
+            rgba[0] = data.at(k++);
+            rgba[1] = data.at(k++);
+            rgba[2] = data.at(k++);
+            rgba[3] = data.at(k++);
+            m_image.setPixel(i, j, color);
+        }
+    }
+    update();
+}
+
+class TNuiColorCameraAdder
+{
+public:
+    TNuiColorCameraAdder(){
+        qmlRegisterType<TNuiColorCamera>("Kinect", 1, 0, "TNuiColorCamera");
+    }
+};
+TNuiColorCameraAdder adder;

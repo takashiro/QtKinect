@@ -1,17 +1,20 @@
 #ifndef TNUICOLORCAMERA_H
 #define TNUICOLORCAMERA_H
 
-#include "tnuiimage.h"
+#include "timage.h"
 
-class TNuiColorStream;
+class TNuiStream;
 
-class TNuiColorCamera : public TNuiImage
+class TNuiColorCamera : public TImage
 {
 public:
     TNuiColorCamera(QQuickItem *parent = 0);
 
 protected:
-    TNuiColorStream *m_stream;
+    void tryOpenStream();
+    void updateFrame();
+
+    TNuiStream *m_stream;
 };
 
 #endif // TNUICOLORCAMERA_H
