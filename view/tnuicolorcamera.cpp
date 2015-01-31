@@ -9,6 +9,9 @@ TNuiColorCamera::TNuiColorCamera(QQuickItem *parent)
     TNuiSensor *sensor = SensorManager->sensor();
     sensor->initialize(TNuiSensor::UseColorFlag);
 
+    m_image = QImage(640, 480, QImage::Format_RGB32);
+    m_image.fill(Qt::black);
+
     m_stream = new TNuiColorStream(sensor);
     connect(sensor, &TNuiSensor::stateChanged, this, &TNuiColorCamera::tryOpenStream);
     tryOpenStream();

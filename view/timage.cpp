@@ -4,7 +4,7 @@
 #include <QTimer>
 
 TImage::TImage(QQuickItem *parent)
-    : QQuickPaintedItem(parent), m_image("ui/image/default-background.jpg")
+    : QQuickPaintedItem(parent)
 {
 }
 
