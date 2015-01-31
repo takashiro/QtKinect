@@ -73,10 +73,10 @@ public:
     bool openImageStream(TNuiStream *stream, ulong imageFrameFlags, ulong frameLimit);
 
     //Gets the next frame of data.
-    bool readNextFrame(TNuiStream *stream, ulong msecondsToWait, NUI_IMAGE_FRAME &ppcImageFrame);
+    bool readImageFrame(TNuiStream *stream, ulong msecondsToWait, NUI_IMAGE_FRAME &ppcImageFrame);
 
     //Releases a frame of data.
-    bool releaseFrame(TNuiStream *stream, NUI_IMAGE_FRAME &frame);
+    bool releaseImageFrame(TNuiStream *stream, NUI_IMAGE_FRAME &frame);
 
 
     /*

@@ -45,12 +45,12 @@ bool TNuiSensor::openImageStream(TNuiStream *stream, ulong imageFrameFlags, ulon
     return SUCCEEDED(hr);
 }
 
-bool TNuiSensor::readNextFrame(TNuiStream *stream, ulong msecondsToWait, NUI_IMAGE_FRAME &ppcImageFrame)
+bool TNuiSensor::readImageFrame(TNuiStream *stream, ulong msecondsToWait, NUI_IMAGE_FRAME &ppcImageFrame)
 {
     return S_OK == m_sensor->NuiImageStreamGetNextFrame(stream->m_streamHandle, msecondsToWait, &ppcImageFrame);
 }
 
-bool TNuiSensor::releaseFrame(TNuiStream *stream, NUI_IMAGE_FRAME &frame)
+bool TNuiSensor::releaseImageFrame(TNuiStream *stream, NUI_IMAGE_FRAME &frame)
 {
     return S_OK == m_sensor->NuiImageStreamReleaseFrame(stream->m_streamHandle, &frame);
 }

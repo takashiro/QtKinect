@@ -13,7 +13,7 @@ void TNuiColorStream::processNewFrame()
     NUI_IMAGE_FRAME imageFrame;
 
     // Attempt to get the color frame
-    if (!m_sensor->readNextFrame(this, 0, imageFrame))
+    if (!m_sensor->readImageFrame(this, 0, imageFrame))
         return;
 
     if (m_paused) {
@@ -37,5 +37,5 @@ void TNuiColorStream::processNewFrame()
     pTexture->UnlockRect(0);
 
 ReleaseFrame:
-    m_sensor->releaseFrame(this, imageFrame);
+    m_sensor->releaseImageFrame(this, imageFrame);
 }
