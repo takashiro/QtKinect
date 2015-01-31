@@ -6,6 +6,8 @@
 #include <Windows.h>
 #include <NuiApi.h>
 
+class TNuiStream;
+
 class TNuiSensor : public QObject
 {
     Q_OBJECT
@@ -67,6 +69,16 @@ public:
     //Gets the Kinect sensor connection ID.
     QString deviceConnectionId() const {return m_deviceConnectionId;}
 
+    //Opens an image stream
+    bool openImageStream(TNuiStream *stream, ulong imageFrameFlags, ulong frameLimit);
+
+    //Gets the next frame of data.
+    bool readNextFrame(TNuiStream *stream, ulong msecondsToWait, NUI_IMAGE_FRAME &ppcImageFrame);
+
+    //Releases a frame of data.
+    bool releaseFrame(TNuiStream *stream, NUI_IMAGE_FRAME &frame);
+
+
     /*
         NuiAccelerometerGetCurrentReading	Gets the accelerometer reading.
         NuiAudioArrayId	Gets the USB device name of the audio array.
@@ -81,9 +93,6 @@ public:
         NuiImageGetColorPixelCoordinatesFromDepthPixel	Gets the pixel coordinates in color space that correspond to the specified pixel coordinates in depth space.
         NuiImageGetColorPixelCoordinatesFromDepthPixelAtResolution	Gets the pixel coordinates in color space that correspond to the specified pixel coordinates in depth space, using the specified depth resolution.
         NuiImageStreamGetImageFrameFlags	Gets the image frame options.
-        NuiImageStreamGetNextFrame	Gets the next frame of data.
-        NuiImageStreamOpen	Opens an image stream.
-        NuiImageStreamReleaseFrame	Releases a frame of data.
         NuiImageStreamSetImageFrameFlags	Sets the image frame options.
         NuiSetForceInfraredEmitterOff	Sets a value indicating whether the infrared emitter is disabled. The default value is false, which means that the infrared sensor is enabled (that is, not disabled).
         NuiSetFrameEndEvent	Sets the event that signals the last frame.
@@ -97,7 +106,7 @@ public:
     */
 
 signals:
-    void stateChanged(State state);
+    void stateChanged();
     void connected();
     void disconnected();
 
@@ -107,7 +116,7 @@ protected:
     State m_state;
 
 private:
-    void _onStateChanged(State state);
+    void _onStateChanged();
 
     INuiSensor *m_sensor;
     QString m_deviceConnectionId;

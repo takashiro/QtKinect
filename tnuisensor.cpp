@@ -1,5 +1,6 @@
 #include "tnuisensor.h"
 #include "windowsutil.h"
+#include "tnuistream.h"
 
 #include <QMap>
 
@@ -18,19 +19,38 @@ TNuiSensor::~TNuiSensor()
     m_sensor->Release();
 }
 
-void TNuiSensor::_onStateChanged(State state)
+void TNuiSensor::_onStateChanged()
 {
-    if (state == NotConnectedState)
+    if (m_state == NotConnectedState)
         emit disconnected();
-    else if (state == ConnectedState)
+    else if (m_state == ConnectedState)
         emit connected();
 }
 
 void TNuiSensor::_updateState()
 {
-    State state = (State) m_sensor->NuiStatus();
-    if (state != m_state) {
-        m_state = state;
-        emit stateChanged(state);
-    }
+    m_state = (State) m_sensor->NuiStatus();
+    emit stateChanged();
+}
+
+bool TNuiSensor::openImageStream(TNuiStream *stream, ulong imageFrameFlags, ulong frameLimit)
+{
+    HRESULT hr = m_sensor->NuiImageStreamOpen(
+                stream->m_imageType,
+                stream->m_imageResolution,
+                imageFrameFlags,
+                frameLimit,
+                stream->m_frameReadyEvent,
+                &stream->m_streamHandle);
+    return SUCCEEDED(hr);
+}
+
+bool TNuiSensor::readNextFrame(TNuiStream *stream, ulong msecondsToWait, NUI_IMAGE_FRAME &ppcImageFrame)
+{
+    return S_OK == m_sensor->NuiImageStreamGetNextFrame(stream->m_streamHandle, msecondsToWait, &ppcImageFrame);
+}
+
+bool TNuiSensor::releaseFrame(TNuiStream *stream, NUI_IMAGE_FRAME &frame)
+{
+    return S_OK == m_sensor->NuiImageStreamReleaseFrame(stream->m_streamHandle, &frame);
 }
