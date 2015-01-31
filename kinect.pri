@@ -20,30 +20,20 @@ INCLUDEPATH += $$PWD/model
 INCLUDEPATH += $$PWD/view
 
 SOURCES += \
-    $$PWD/tnuisensorselector.cpp \
-    $$PWD/tbackgroundremover.cpp \
     $$PWD/windowsutil.cpp \
-    $$PWD/tnuicolorstream.cpp \
     $$PWD/tnuistream.cpp \
     $$PWD/tnuisensor.cpp \
-    $$PWD/model/tnuiimagebuffer.cpp \
-    $$PWD/view/tbackgroundremovedcamera.cpp \
     $$PWD/view/timage.cpp \
     $$PWD/view/tnuicolorcamera.cpp \
-    $$PWD/view/tnuiimage.cpp \
-    $$PWD/tnuisensormanager.cpp
+    $$PWD/tnuisensormanager.cpp \
+    $$PWD/tnuicolorstream.cpp
 
 HEADERS += \
-    $$PWD/tnuisensorselector.h \
-    $$PWD/tbackgroundremover.h \
     $$PWD/windowsutil.h \
     $$PWD/stdafx.h \
-    $$PWD/tnuicolorstream.h \
     $$PWD/tnuistream.h \
     $$PWD/tnuisensor.h \
-    $$PWD/model/tnuiimagebuffer.h \
-    $$PWD/view/tbackgroundremovedcamera.h \
     $$PWD/view/timage.h \
     $$PWD/view/tnuicolorcamera.h \
-    $$PWD/view/tnuiimage.h \
-    $$PWD/tnuisensormanager.h
+    $$PWD/tnuisensormanager.h \
+    $$PWD/tnuicolorstream.h
