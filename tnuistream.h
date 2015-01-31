@@ -1,38 +1,54 @@
 #ifndef TNUISTREAM_H
 #define TNUISTREAM_H
 
-#include <QObject>
+#include <QThread>
+#include <QMutex>
+#include <QVector>
 
 #include <Windows.h>
 #include <NuiApi.h>
 
-class TNuiStream : public QObject
+class TNuiSensor;
+
+class TNuiStream : public QThread
 {
     Q_OBJECT
 
 public:
-    TNuiStream(INuiSensor *nuiSensor);
+    friend class TNuiSensor;
+
+    TNuiStream(TNuiSensor *parent);
     virtual ~TNuiStream();
 
-public:
-    // Subclass should override this method to process the next incoming
-    // stream frame when stream event is set.
-    virtual void processStreamFrame() = 0;
+    TNuiSensor *sensor() const {return m_sensor;}
+    QVector<uchar> data() const {return m_data;}
+
+    bool open();
+    bool isOpen() const {return m_isOpen;}
 
     // Pause the stream
-    virtual void pauseStream(bool pause);
+    void pause(bool pause);
 
-    // Subclass should override this method to start the stream processing.
-    virtual bool startStream() = 0;
-
-    HANDLE getFrameReadyEvent() {return m_frameReadyEvent;}
+signals:
+    void readyRead();
 
 protected:
-    INuiSensor *m_nuiSensor;
+    virtual void processNewFrame() = 0;
 
-    bool m_paused;
     HANDLE m_streamHandle;
     HANDLE m_frameReadyEvent;
+    TNuiSensor *m_sensor;
+    QVector<uchar> m_data;
+    NUI_IMAGE_TYPE m_imageType;
+    NUI_IMAGE_RESOLUTION m_imageResolution;
+    bool m_paused;
+    bool m_isOpen;
+
+private:
+    void run();
+
+    QMutex m_mutex;
+    HANDLE m_stopThreadEvent;
 };
 
 #endif // TNUISTREAM_H
