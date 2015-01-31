@@ -70,6 +70,7 @@ TNuiSensorManager *TNuiSensorManager::instance()
 TNuiSensorManager::~TNuiSensorManager()
 {
     foreach (TNuiSensor *sensor, m_sensors) {
+        sensor->shutdown();
         delete sensor;
     }
 }
