@@ -5,7 +5,6 @@
 TNuiStream::TNuiStream(TNuiSensor *parent)
     : QThread(parent)
     , m_sensor(parent)
-    , m_streamHandle(INVALID_HANDLE_VALUE)
     , m_frameReadyEvent(CreateEventW(nullptr, TRUE, FALSE, nullptr))
     , m_paused(false)
     , m_isOpen(false)
@@ -18,12 +17,6 @@ TNuiStream::~TNuiStream()
     SetEvent(m_stopThreadEvent);
     pause(false);
     wait();
-}
-
-bool TNuiStream::open()
-{
-    m_isOpen = m_sensor->openImageStream(this, 0, 2);
-    return m_isOpen;
 }
 
 void TNuiStream::pause(bool pause)
@@ -49,8 +42,8 @@ void TNuiStream::run()
         if (WAIT_OBJECT_0 == ret){
             break;
         } else if (WAIT_OBJECT_0 + 1 == ret) {
-            processNewFrame();
-            emit readyRead();
+            if (processNewFrame())
+                emit readyRead();
         }
     }
 }

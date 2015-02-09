@@ -6,7 +6,8 @@
 #include <Windows.h>
 #include <NuiApi.h>
 
-class TNuiStream;
+class TNuiImageStream;
+class TNuiSkeletonStream;
 
 class TNuiSensor : public QObject
 {
@@ -70,14 +71,20 @@ public:
     QString deviceConnectionId() const {return m_deviceConnectionId;}
 
     //Opens an image stream
-    bool openImageStream(TNuiStream *stream, ulong imageFrameFlags, ulong frameLimit);
+    bool openImageStream(TNuiImageStream *stream, ulong imageFrameFlags, ulong frameLimit);
 
     //Gets the next frame of data.
-    bool readImageFrame(TNuiStream *stream, ulong msecondsToWait, NUI_IMAGE_FRAME &ppcImageFrame);
+    bool readImageFrame(TNuiImageStream *stream, ulong msecondsToWait, NUI_IMAGE_FRAME &ppcImageFrame);
 
     //Releases a frame of data.
-    bool releaseImageFrame(TNuiStream *stream, NUI_IMAGE_FRAME &frame);
+    bool releaseImageFrame(TNuiImageStream *stream, NUI_IMAGE_FRAME &frame);
 
+    bool openSkeletionStream(TNuiSkeletonStream *stream, ulong flags);
+    bool closeSkeletonStream();
+
+    //Gets the next frame of data from the skeleton stream.
+    bool readSkeletonFrame(ulong msecondsToWait, NUI_SKELETON_FRAME &frame);
+    //NuiSkeletonSetTrackedSkeletons	Sets an array of identifiers (IDs) for skeleton tracking.
 
     /*
         NuiAccelerometerGetCurrentReading	Gets the accelerometer reading.
@@ -96,10 +103,6 @@ public:
         NuiImageStreamSetImageFrameFlags	Sets the image frame options.
         NuiSetForceInfraredEmitterOff	Sets a value indicating whether the infrared emitter is disabled. The default value is false, which means that the infrared sensor is enabled (that is, not disabled).
         NuiSetFrameEndEvent	Sets the event that signals the last frame.
-        NuiSkeletonGetNextFrame	Gets the next frame of data from the skeleton stream.
-        NuiSkeletonSetTrackedSkeletons	Sets an array of identifiers (IDs) for skeleton tracking.
-        NuiSkeletonTrackingDisable	Disables skeleton tracking.
-        NuiSkeletonTrackingEnable	Enables skeleton tracking.
         NuiTransformSmooth	Filters skeleton positions to reduce jitter between frames.
         NuiUniqueId	Do not use this method.
         QueryInterface	Gets the supported interfaces.

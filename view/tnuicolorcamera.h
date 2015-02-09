@@ -3,7 +3,7 @@
 
 #include "timage.h"
 
-class TNuiStream;
+class TNuiImageStream;
 
 class TNuiColorCamera : public TImage
 {
@@ -14,7 +14,7 @@ protected:
     void tryOpenStream();
     void updateFrame();
 
-    TNuiStream *m_stream;
+    TNuiImageStream *m_stream;
 };
 
 #endif // TNUICOLORCAMERA_H

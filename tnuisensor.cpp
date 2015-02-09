@@ -1,8 +1,7 @@
 #include "tnuisensor.h"
 #include "windowsutil.h"
-#include "tnuistream.h"
-
-#include <QMap>
+#include "tnuiimagestream.h"
+#include "tnuiskeletonstream.h"
 
 TNuiSensor::TNuiSensor(INuiSensor *sensor, QObject *parent)
     : QObject(parent)
@@ -33,11 +32,11 @@ void TNuiSensor::_updateState()
     emit stateChanged();
 }
 
-bool TNuiSensor::openImageStream(TNuiStream *stream, ulong imageFrameFlags, ulong frameLimit)
+bool TNuiSensor::openImageStream(TNuiImageStream *stream, ulong imageFrameFlags, ulong frameLimit)
 {
     HRESULT hr = m_sensor->NuiImageStreamOpen(
-                stream->m_imageType,
-                stream->m_imageResolution,
+                (NUI_IMAGE_TYPE) stream->m_imageType,
+                (NUI_IMAGE_RESOLUTION) stream->m_imageResolution,
                 imageFrameFlags,
                 frameLimit,
                 stream->m_frameReadyEvent,
@@ -45,12 +44,27 @@ bool TNuiSensor::openImageStream(TNuiStream *stream, ulong imageFrameFlags, ulon
     return SUCCEEDED(hr);
 }
 
-bool TNuiSensor::readImageFrame(TNuiStream *stream, ulong msecondsToWait, NUI_IMAGE_FRAME &ppcImageFrame)
+bool TNuiSensor::readImageFrame(TNuiImageStream *stream, ulong msecondsToWait, NUI_IMAGE_FRAME &ppcImageFrame)
 {
     return S_OK == m_sensor->NuiImageStreamGetNextFrame(stream->m_streamHandle, msecondsToWait, &ppcImageFrame);
 }
 
-bool TNuiSensor::releaseImageFrame(TNuiStream *stream, NUI_IMAGE_FRAME &frame)
+bool TNuiSensor::releaseImageFrame(TNuiImageStream *stream, NUI_IMAGE_FRAME &frame)
 {
     return S_OK == m_sensor->NuiImageStreamReleaseFrame(stream->m_streamHandle, &frame);
+}
+
+bool TNuiSensor::openSkeletionStream(TNuiSkeletonStream *stream, ulong flags)
+{
+    return S_OK == m_sensor->NuiSkeletonTrackingEnable(stream->m_frameReadyEvent, flags);
+}
+
+bool TNuiSensor::readSkeletonFrame(ulong msecondsToWait, NUI_SKELETON_FRAME &frame)
+{
+    return S_OK == m_sensor->NuiSkeletonGetNextFrame(msecondsToWait, &frame);
+}
+
+bool TNuiSensor::closeSkeletonStream()
+{
+    return S_OK == m_sensor->NuiSkeletonTrackingDisable();
 }

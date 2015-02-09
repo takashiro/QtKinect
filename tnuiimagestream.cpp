@@ -1,20 +1,28 @@
-#include "tnuicolorstream.h"
+#include "tnuiimagestream.h"
 #include "tnuisensor.h"
 
-TNuiColorStream::TNuiColorStream(TNuiSensor *parent)
+TNuiImageStream::TNuiImageStream(TNuiSensor *parent, ImageType imageType)
     : TNuiStream(parent)
+    , m_streamHandle(INVALID_HANDLE_VALUE)
+    , m_imageType(imageType)
+    , m_imageResolution(Resolution_640x480)
 {
-    m_imageType = NUI_IMAGE_TYPE_COLOR;
-    m_imageResolution = NUI_IMAGE_RESOLUTION_640x480;
 }
 
-void TNuiColorStream::processNewFrame()
+bool TNuiImageStream::open()
 {
+    m_isOpen = m_sensor->openImageStream(this, 0, 2);
+    return m_isOpen;
+}
+
+bool TNuiImageStream::processNewFrame()
+{
+    bool isValid = false;
     NUI_IMAGE_FRAME imageFrame;
 
     // Attempt to get the color frame
     if (!m_sensor->readImageFrame(this, 0, imageFrame))
-        return;
+        return false;
 
     if (m_paused) {
         // Stream paused. Skip frame process and release the frame.
@@ -31,6 +39,7 @@ void TNuiColorStream::processNewFrame()
     if (lockedRect.Pitch != 0) {
         m_data.resize(lockedRect.size);
         memcpy_s(m_data.data(), lockedRect.size, lockedRect.pBits, lockedRect.size);
+        isValid = true;
     }
 
     // Unlock frame data
@@ -38,4 +47,5 @@ void TNuiColorStream::processNewFrame()
 
 ReleaseFrame:
     m_sensor->releaseImageFrame(this, imageFrame);
+    return isValid;
 }

@@ -1,6 +1,6 @@
 #include "tnuicolorcamera.h"
 #include "tnuisensor.h"
-#include "tnuicolorstream.h"
+#include "tnuiimagestream.h"
 #include "tnuisensormanager.h"
 
 TNuiColorCamera::TNuiColorCamera(QQuickItem *parent)

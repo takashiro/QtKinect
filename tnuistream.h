@@ -21,9 +21,8 @@ public:
     virtual ~TNuiStream();
 
     TNuiSensor *sensor() const {return m_sensor;}
-    QVector<uchar> data() const {return m_data;}
 
-    bool open();
+    virtual bool open() = 0;
     bool isOpen() const {return m_isOpen;}
 
     // Pause the stream
@@ -33,14 +32,10 @@ signals:
     void readyRead();
 
 protected:
-    virtual void processNewFrame() = 0;
+    virtual bool processNewFrame() = 0;
 
-    HANDLE m_streamHandle;
     HANDLE m_frameReadyEvent;
     TNuiSensor *m_sensor;
-    QVector<uchar> m_data;
-    NUI_IMAGE_TYPE m_imageType;
-    NUI_IMAGE_RESOLUTION m_imageResolution;
     bool m_paused;
     bool m_isOpen;
 
