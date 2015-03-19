@@ -45,6 +45,8 @@ void TNuiStream::run()
         } else if (ret == 1) {//m_frameReadyEvent
             if (processNewFrame())
                 emit readyRead();
+        } else {
+            break;
         }
     }
 }

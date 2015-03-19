@@ -28,7 +28,8 @@ SOURCES += \
     $$PWD/tnuisensormanager.cpp \
     $$PWD/tnuiskeletonstream.cpp \
     $$PWD/tnuiimagestream.cpp \
-    $$PWD/tnuitracker.cpp
+    $$PWD/tnuitracker.cpp \
+    $$PWD/view/tnuimouse.cpp
 
 HEADERS += \
     $$PWD/windowsutil.h \
@@ -40,4 +41,5 @@ HEADERS += \
     $$PWD/tnuisensormanager.h \
     $$PWD/tnuiskeletonstream.h \
     $$PWD/tnuiimagestream.h \
-    $$PWD/tnuitracker.h
+    $$PWD/tnuitracker.h \
+    $$PWD/view/tnuimouse.h

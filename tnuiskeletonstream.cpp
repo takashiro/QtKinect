@@ -7,6 +7,11 @@ TNuiSkeletonStream::TNuiSkeletonStream(TNuiSensor *sensor, TrackingFlags flags)
 {
 }
 
+TNuiSkeletonStream::~TNuiSkeletonStream()
+{
+    m_sensor->closeSkeletonStream();
+}
+
 bool TNuiSkeletonStream::open()
 {
     bool open = m_sensor->openSkeletionStream(this, m_flags);

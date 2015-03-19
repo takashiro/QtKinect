@@ -19,6 +19,7 @@ public:
     typedef ulong TrackingFlags;
 
     TNuiSkeletonStream(TNuiSensor *sensor, TrackingFlags flags);
+    ~TNuiSkeletonStream();
 
     bool open();
     bool close();
