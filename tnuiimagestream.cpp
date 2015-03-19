@@ -12,16 +12,17 @@ TNuiImageStream::TNuiImageStream(TNuiSensor *parent, ImageType imageType)
 bool TNuiImageStream::open()
 {
     m_isOpen = m_sensor->openImageStream(this, 0, 2);
+    if (m_isOpen)
+        start();
     return m_isOpen;
 }
 
 bool TNuiImageStream::processNewFrame()
 {
     bool isValid = false;
-    NUI_IMAGE_FRAME imageFrame;
 
     // Attempt to get the color frame
-    if (!m_sensor->readImageFrame(this, 0, imageFrame))
+    if (!m_sensor->readImageFrame(this, 0, m_frame))
         return false;
 
     if (m_paused) {
@@ -29,7 +30,7 @@ bool TNuiImageStream::processNewFrame()
         goto ReleaseFrame;
     }
 
-    INuiFrameTexture *pTexture = imageFrame.pFrameTexture;
+    INuiFrameTexture *pTexture = m_frame.pFrameTexture;
 
     // Lock the frame data so the Kinect knows not to modify it while we are reading it
     NUI_LOCKED_RECT lockedRect;
@@ -46,6 +47,6 @@ bool TNuiImageStream::processNewFrame()
     pTexture->UnlockRect(0);
 
 ReleaseFrame:
-    m_sensor->releaseImageFrame(this, imageFrame);
+    m_sensor->releaseImageFrame(this, m_frame);
     return isValid;
 }

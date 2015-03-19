@@ -6,12 +6,10 @@
 TNuiColorCamera::TNuiColorCamera(QQuickItem *parent)
     : TImage(parent)
 {
-    TNuiSensor *sensor = SensorManager->sensor();
-    sensor->initialize(TNuiSensor::UseColorFlag);
-
     m_image = QImage(640, 480, QImage::Format_RGB32);
     m_image.fill(Qt::black);
 
+    TNuiSensor *sensor = SensorManager->sensor();
     m_stream = new TNuiColorStream(sensor);
     connect(sensor, &TNuiSensor::stateChanged, this, &TNuiColorCamera::tryOpenStream);
     tryOpenStream();
@@ -21,7 +19,6 @@ void TNuiColorCamera::tryOpenStream()
 {
     if (m_stream->open()) {
         disconnect(m_stream->sensor(), &TNuiSensor::stateChanged, this, &TNuiColorCamera::tryOpenStream);
-        m_stream->start();
         connect(m_stream, &TNuiStream::readyRead, this, &TNuiColorCamera::updateFrame);
     }
 }
@@ -51,4 +48,4 @@ public:
         qmlRegisterType<TNuiColorCamera>("Kinect", 1, 0, "TNuiColorCamera");
     }
 };
-TNuiColorCameraAdder adder;
+static TNuiColorCameraAdder adder;

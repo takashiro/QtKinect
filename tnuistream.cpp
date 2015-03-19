@@ -39,9 +39,10 @@ void TNuiStream::run()
         m_mutex.lock();
         m_mutex.unlock();
         DWORD ret = WaitForMultipleObjects(ARRAYSIZE(events), events, FALSE, INFINITE);
-        if (WAIT_OBJECT_0 == ret){
+        ret -= WAIT_OBJECT_0;
+        if (ret == 0){//m_stopThreadEvent
             break;
-        } else if (WAIT_OBJECT_0 + 1 == ret) {
+        } else if (ret == 1) {//m_frameReadyEvent
             if (processNewFrame())
                 emit readyRead();
         }

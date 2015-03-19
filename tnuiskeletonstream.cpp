@@ -9,12 +9,20 @@ TNuiSkeletonStream::TNuiSkeletonStream(TNuiSensor *sensor, TrackingFlags flags)
 
 bool TNuiSkeletonStream::open()
 {
-    return m_sensor->openSkeletionStream(this, m_flags);
+    bool open = m_sensor->openSkeletionStream(this, m_flags);
+    if (open)
+        start();
+    return open;
 }
 
 bool TNuiSkeletonStream::close()
 {
     return m_sensor->closeSkeletonStream();
+}
+
+bool TNuiSkeletonStream::reopen()
+{
+    return m_sensor->closeSkeletonStream() && m_sensor->openSkeletionStream(this, m_flags);
 }
 
 void TNuiSkeletonStream::readFrame(NUI_SKELETON_FRAME &frame)

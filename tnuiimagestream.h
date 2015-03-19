@@ -26,16 +26,21 @@ public:
         Resolution_1280x960 = NUI_IMAGE_RESOLUTION_1280x960
     };
 
-    TNuiImageStream(TNuiSensor *parent, ImageType imageType);
 
     bool open();
     QVector<uchar> data() const {return m_data;}
+    ImageType imageType() const {return m_imageType;}
+    ImageResolution imageResolution() const {return m_imageResolution;}
+    const NUI_IMAGE_FRAME &frame() const {return m_frame;}
 
 protected:
+    TNuiImageStream(TNuiSensor *parent, ImageType imageType);
+
     bool processNewFrame();
 
     HANDLE m_streamHandle;
     QVector<uchar> m_data;
+    NUI_IMAGE_FRAME m_frame;
 
     ImageType m_imageType;
     ImageResolution m_imageResolution;

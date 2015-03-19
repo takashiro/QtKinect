@@ -8,6 +8,8 @@ class TNuiSensor;
 class TNuiSkeletonStream : public TNuiStream
 {
 public:
+    friend class TNuiSensor;
+
     enum TrackingFlag{
         SupressNoFrameData = NUI_SKELETON_TRACKING_FLAG_SUPPRESS_NO_FRAME_DATA,
         TitleSetsTrackedSkeletions = NUI_SKELETON_TRACKING_FLAG_TITLE_SETS_TRACKED_SKELETONS,
@@ -20,12 +22,17 @@ public:
 
     bool open();
     bool close();
+    bool reopen();
+
+    void setFlags(TrackingFlags flags) {m_flags |= flags;}
+    void resetFlags(TrackingFlags flags) {m_flags &= ~flags;}
+
+    void readFrame(NUI_SKELETON_FRAME &frame);
 
 protected:
     bool processNewFrame();
-    void readFrame(NUI_SKELETON_FRAME &frame);
 
-    ulong m_flags;
+    TrackingFlags m_flags;
     NUI_SKELETON_FRAME m_frame;
     QMutex m_frameMutex;
 };
