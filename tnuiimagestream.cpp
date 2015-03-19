@@ -11,7 +11,7 @@ TNuiImageStream::TNuiImageStream(TNuiSensor *parent, ImageType imageType)
 
 bool TNuiImageStream::open()
 {
-    m_isOpen = m_sensor->openImageStream(this, 0, 2);
+    m_isOpen = m_sensor->_openImageStream(this, 0, 2);
     if (m_isOpen)
         start();
     return m_isOpen;
@@ -22,7 +22,7 @@ bool TNuiImageStream::processNewFrame()
     bool isValid = false;
 
     // Attempt to get the color frame
-    if (!m_sensor->readImageFrame(this, 0, m_frame))
+    if (!m_sensor->_readImageFrame(this, 0, m_frame))
         return false;
 
     if (m_paused) {
@@ -47,6 +47,6 @@ bool TNuiImageStream::processNewFrame()
     pTexture->UnlockRect(0);
 
 ReleaseFrame:
-    m_sensor->releaseImageFrame(this, m_frame);
+    m_sensor->_releaseImageFrame(this, m_frame);
     return isValid;
 }

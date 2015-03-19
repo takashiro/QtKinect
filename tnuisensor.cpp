@@ -32,7 +32,7 @@ void TNuiSensor::_updateState()
     emit stateChanged();
 }
 
-bool TNuiSensor::openImageStream(TNuiImageStream *stream, ulong imageFrameFlags, ulong frameLimit)
+bool TNuiSensor::_openImageStream(TNuiImageStream *stream, ulong imageFrameFlags, ulong frameLimit)
 {
     HRESULT hr = m_sensor->NuiImageStreamOpen(
                 (NUI_IMAGE_TYPE) stream->m_imageType,
@@ -44,27 +44,27 @@ bool TNuiSensor::openImageStream(TNuiImageStream *stream, ulong imageFrameFlags,
     return SUCCEEDED(hr);
 }
 
-bool TNuiSensor::readImageFrame(TNuiImageStream *stream, ulong msecondsToWait, NUI_IMAGE_FRAME &ppcImageFrame)
+bool TNuiSensor::_readImageFrame(TNuiImageStream *stream, ulong msecondsToWait, NUI_IMAGE_FRAME &ppcImageFrame)
 {
     return S_OK == m_sensor->NuiImageStreamGetNextFrame(stream->m_streamHandle, msecondsToWait, &ppcImageFrame);
 }
 
-bool TNuiSensor::releaseImageFrame(TNuiImageStream *stream, NUI_IMAGE_FRAME &frame)
+bool TNuiSensor::_releaseImageFrame(TNuiImageStream *stream, NUI_IMAGE_FRAME &frame)
 {
     return S_OK == m_sensor->NuiImageStreamReleaseFrame(stream->m_streamHandle, &frame);
 }
 
-bool TNuiSensor::openSkeletionStream(TNuiSkeletonStream *stream, ulong flags)
+bool TNuiSensor::_openSkeletionStream(TNuiSkeletonStream *stream, ulong flags)
 {
     return S_OK == m_sensor->NuiSkeletonTrackingEnable(stream->m_frameReadyEvent, flags);
 }
 
-bool TNuiSensor::readSkeletonFrame(ulong msecondsToWait, NUI_SKELETON_FRAME &frame)
+bool TNuiSensor::_readSkeletonFrame(ulong msecondsToWait, NUI_SKELETON_FRAME &frame)
 {
     return S_OK == m_sensor->NuiSkeletonGetNextFrame(msecondsToWait, &frame);
 }
 
-bool TNuiSensor::closeSkeletonStream()
+bool TNuiSensor::_closeSkeletonStream()
 {
     return S_OK == m_sensor->NuiSkeletonTrackingDisable();
 }

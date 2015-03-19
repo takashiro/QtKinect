@@ -15,6 +15,8 @@ class TNuiSensor : public QObject
 
 public:
     friend class TNuiSensorManager;
+    friend class TNuiImageStream;
+    friend class TNuiSkeletonStream;
 
     enum State{
         ConnectedState = S_OK,
@@ -70,22 +72,6 @@ public:
     //Gets the Kinect sensor connection ID.
     QString deviceConnectionId() const {return m_deviceConnectionId;}
 
-    //Opens an image stream
-    bool openImageStream(TNuiImageStream *stream, ulong imageFrameFlags, ulong frameLimit);
-
-    //Gets the next frame of data.
-    bool readImageFrame(TNuiImageStream *stream, ulong msecondsToWait, NUI_IMAGE_FRAME &ppcImageFrame);
-
-    //Releases a frame of data.
-    bool releaseImageFrame(TNuiImageStream *stream, NUI_IMAGE_FRAME &frame);
-
-    bool openSkeletionStream(TNuiSkeletonStream *stream, ulong flags);
-    bool closeSkeletonStream();
-
-    //Gets the next frame of data from the skeleton stream.
-    bool readSkeletonFrame(ulong msecondsToWait, NUI_SKELETON_FRAME &frame);
-    //NuiSkeletonSetTrackedSkeletons	Sets an array of identifiers (IDs) for skeleton tracking.
-
     /*
         NuiAccelerometerGetCurrentReading	Gets the accelerometer reading.
         NuiAudioArrayId	Gets the USB device name of the audio array.
@@ -114,6 +100,22 @@ signals:
     void disconnected();
 
 protected:
+    //Opens an image stream
+    bool _openImageStream(TNuiImageStream *stream, ulong imageFrameFlags, ulong frameLimit);
+
+    //Gets the next frame of data.
+    bool _readImageFrame(TNuiImageStream *stream, ulong msecondsToWait, NUI_IMAGE_FRAME &ppcImageFrame);
+
+    //Releases a frame of data.
+    bool _releaseImageFrame(TNuiImageStream *stream, NUI_IMAGE_FRAME &frame);
+
+    bool _openSkeletionStream(TNuiSkeletonStream *stream, ulong flags);
+    bool _closeSkeletonStream();
+
+    //Gets the next frame of data from the skeleton stream.
+    bool _readSkeletonFrame(ulong msecondsToWait, NUI_SKELETON_FRAME &frame);
+    //NuiSkeletonSetTrackedSkeletons	Sets an array of identifiers (IDs) for skeleton tracking.
+
     void _updateState();
 
     State m_state;

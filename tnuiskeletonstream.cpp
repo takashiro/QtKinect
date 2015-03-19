@@ -9,12 +9,12 @@ TNuiSkeletonStream::TNuiSkeletonStream(TNuiSensor *sensor, TrackingFlags flags)
 
 TNuiSkeletonStream::~TNuiSkeletonStream()
 {
-    m_sensor->closeSkeletonStream();
+    m_sensor->_closeSkeletonStream();
 }
 
 bool TNuiSkeletonStream::open()
 {
-    bool open = m_sensor->openSkeletionStream(this, m_flags);
+    bool open = m_sensor->_openSkeletionStream(this, m_flags);
     if (open)
         start();
     return open;
@@ -22,12 +22,12 @@ bool TNuiSkeletonStream::open()
 
 bool TNuiSkeletonStream::close()
 {
-    return m_sensor->closeSkeletonStream();
+    return m_sensor->_closeSkeletonStream();
 }
 
 bool TNuiSkeletonStream::reopen()
 {
-    return m_sensor->closeSkeletonStream() && m_sensor->openSkeletionStream(this, m_flags);
+    return m_sensor->_closeSkeletonStream() && m_sensor->_openSkeletionStream(this, m_flags);
 }
 
 void TNuiSkeletonStream::readFrame(NUI_SKELETON_FRAME &frame)
@@ -41,7 +41,7 @@ bool TNuiSkeletonStream::processNewFrame()
 {
     // Attempt to get the color frame
     m_frameMutex.lock();
-    bool isValid = m_sensor->readSkeletonFrame(0, m_frame);
+    bool isValid = m_sensor->_readSkeletonFrame(0, m_frame);
     m_frameMutex.unlock();
     return isValid;
 }
