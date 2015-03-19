@@ -9,6 +9,8 @@ class TNuiTracker;
 
 class TNuiMouse : public QQuickItem
 {
+    Q_OBJECT
+
 public:
     TNuiMouse(QQuickItem *parent = 0);
     ~TNuiMouse();

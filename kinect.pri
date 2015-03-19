@@ -29,7 +29,9 @@ SOURCES += \
     $$PWD/tnuiskeletonstream.cpp \
     $$PWD/tnuiimagestream.cpp \
     $$PWD/tnuitracker.cpp \
-    $$PWD/view/tnuimouse.cpp
+    $$PWD/view/tnuimouse.cpp \
+    $$PWD/view/tnuimousearea.cpp \
+    $$PWD/kinectglobal.cpp
 
 HEADERS += \
     $$PWD/windowsutil.h \
@@ -42,4 +44,6 @@ HEADERS += \
     $$PWD/tnuiskeletonstream.h \
     $$PWD/tnuiimagestream.h \
     $$PWD/tnuitracker.h \
-    $$PWD/view/tnuimouse.h
+    $$PWD/view/tnuimouse.h \
+    $$PWD/view/tnuimousearea.h \
+    $$PWD/kinectglobal.h

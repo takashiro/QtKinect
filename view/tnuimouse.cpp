@@ -1,6 +1,7 @@
 #include "tnuimouse.h"
 
 #include "tnuisensormanager.h"
+#include "tnuisensor.h"
 #include "tnuiskeletonstream.h"
 #include "tnuiimagestream.h"
 #include "tnuitracker.h"
@@ -12,22 +13,15 @@ TNuiMouse::TNuiMouse(QQuickItem *parent)
 {
     TNuiSensor *sensor = SensorManager->sensor();
 
-    m_skeletonStream = new TNuiSkeletonStream(sensor, TNuiSkeletonStream::EnableInNearRange | TNuiSkeletonStream::EnableSeatedSupport);
-    m_skeletonStream->open();
-
     m_colorStream = new TNuiColorStream(sensor);
-
-    m_tracker = new TNuiTracker(m_skeletonStream, m_colorStream);
-    connect(m_tracker, &TNuiTracker::rightHandMoved, this, &TNuiMouse::setPosition);
+    m_tracker = new TNuiTracker(sensor, m_colorStream);
+    connect(m_tracker, &TNuiTracker::moved, this, &TNuiMouse::setPosition);
 
     setFlags(flags() | QQuickItem::ItemHasContents);
 }
 
 TNuiMouse::~TNuiMouse()
 {
-    m_skeletonStream->deleteLater();
-    m_colorStream->deleteLater();
-    m_tracker->deleteLater();
 }
 
 QSGNode *TNuiMouse::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
@@ -40,13 +34,3 @@ QSGNode *TNuiMouse::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
     n->setRect(boundingRect());
     return n;
 }
-
-class TNuiMouseAdder
-{
-public:
-    TNuiMouseAdder()
-    {
-        qmlRegisterType<TNuiMouse>("Kinect", 1, 0, "TNuiMouse");
-    }
-};
-TNuiMouseAdder adder;

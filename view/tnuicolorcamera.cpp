@@ -40,12 +40,3 @@ void TNuiColorCamera::updateFrame()
     }
     update();
 }
-
-class TNuiColorCameraAdder
-{
-public:
-    TNuiColorCameraAdder(){
-        qmlRegisterType<TNuiColorCamera>("Kinect", 1, 0, "TNuiColorCamera");
-    }
-};
-static TNuiColorCameraAdder adder;

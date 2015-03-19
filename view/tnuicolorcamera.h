@@ -7,6 +7,8 @@ class TNuiImageStream;
 
 class TNuiColorCamera : public TImage
 {
+    Q_OBJECT
+
 public:
     TNuiColorCamera(QQuickItem *parent = 0);
 

@@ -5,7 +5,7 @@
 
 #include <QCoreApplication>
 
-TNuiSensorManager *SensorManager = TNuiSensorManager::instance();
+TNuiSensorManager *SensorManager = nullptr;
 
 void CALLBACK TNuiSensorManager::ChangeStatusCallback(HRESULT hrStatus, const OLECHAR *instanceName, const OLECHAR *, void *userData)
 {
@@ -70,7 +70,8 @@ TNuiSensorManager *TNuiSensorManager::instance()
 TNuiSensorManager::~TNuiSensorManager()
 {
     foreach (TNuiSensor *sensor, m_sensors) {
-        sensor->shutdown();
+        //@todo: it takes an extremely long time to shutdown()
+        //sensor->shutdown();
         delete sensor;
     }
 }
