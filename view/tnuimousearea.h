@@ -25,10 +25,6 @@ signals:
     void touched();
 
 private:
-    TNuiSkeletonStream *m_skeletonStream;
-    TNuiColorStream *m_colorStream;
-    TNuiTracker *m_tracker;
-
     bool m_isFocused;
     QDateTime m_focusTimeOffset;
 };

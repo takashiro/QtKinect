@@ -12,9 +12,11 @@ TNuiMouseArea::TNuiMouseArea(QQuickItem *parent)
 {
     TNuiSensor *sensor = SensorManager->sensor();
 
-    m_colorStream = new TNuiColorStream(sensor);
-    m_tracker = new TNuiTracker(sensor, m_colorStream);
-    connect(m_tracker, &TNuiTracker::moved, this, &TNuiMouseArea::onMouseMoved);
+    TNuiColorStream *colorStream = new TNuiColorStream(sensor);
+    TNuiTracker *leftTracker = new TNuiTracker(sensor, colorStream, NUI_SKELETON_POSITION_HAND_LEFT);
+    TNuiTracker *rightTracker = new TNuiTracker(sensor, colorStream, NUI_SKELETON_POSITION_HAND_RIGHT);
+    connect(leftTracker, &TNuiTracker::moved, this, &TNuiMouseArea::onMouseMoved);
+    connect(rightTracker, &TNuiTracker::moved, this, &TNuiMouseArea::onMouseMoved);
 }
 
 TNuiMouseArea::~TNuiMouseArea()

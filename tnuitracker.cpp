@@ -35,10 +35,11 @@ QPointF MapToScreen(const Vector4 &point, TNuiImageStream *stream) {
     return QPointF(x, y);
 }
 
-TNuiTracker::TNuiTracker(TNuiSensor *sensor, TNuiImageStream *imageStream)
+TNuiTracker::TNuiTracker(TNuiSensor *sensor, TNuiImageStream *imageStream, NUI_SKELETON_POSITION_INDEX pos)
     : QObject(sensor)
     , m_skeletonStream(sensor->createSkeletonStream())
     , m_imageStream(imageStream)
+    , m_pos(pos)
 {
     connect(m_skeletonStream, &TNuiSkeletonStream::readyRead, this, &TNuiTracker::handleNewFrame);
 }
@@ -51,7 +52,7 @@ void TNuiTracker::handleNewFrame()
     //@todo: Track more players
     for (int i = 0; i < NUI_SKELETON_COUNT; i++) {
         if (frame.SkeletonData[i].dwTrackingID != 0){
-            QPointF pos = MapToScreen(frame.SkeletonData[i].SkeletonPositions[NUI_SKELETON_POSITION_HAND_RIGHT], m_imageStream);
+            QPointF pos = MapToScreen(frame.SkeletonData[i].SkeletonPositions[m_pos], m_imageStream);
             emit moved(pos);
             break;
         }

@@ -3,6 +3,9 @@
 
 #include <QObject>
 
+#include <Windows.h>
+#include <NuiApi.h>
+
 class TNuiSkeletonStream;
 class TNuiImageStream;
 class TNuiSensor;
@@ -12,7 +15,7 @@ class TNuiTracker : public QObject
     Q_OBJECT
 
 public:
-    TNuiTracker(TNuiSensor *sensor, TNuiImageStream *imageStream);
+    TNuiTracker(TNuiSensor *sensor, TNuiImageStream *imageStream, NUI_SKELETON_POSITION_INDEX pos = NUI_SKELETON_POSITION_HAND_RIGHT);
 
 signals:
     void moved(const QPointF &position);
@@ -22,6 +25,7 @@ protected:
 
     TNuiSkeletonStream *m_skeletonStream;
     TNuiImageStream *m_imageStream;
+    NUI_SKELETON_POSITION_INDEX m_pos;
 };
 
 #endif // TNUITRACKER_H
