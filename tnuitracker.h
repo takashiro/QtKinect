@@ -5,16 +5,17 @@
 
 class TNuiSkeletonStream;
 class TNuiImageStream;
+class TNuiSensor;
 
 class TNuiTracker : public QObject
 {
     Q_OBJECT
 
 public:
-    TNuiTracker(TNuiSkeletonStream *parent, TNuiImageStream *imageStream);
+    TNuiTracker(TNuiSensor *sensor, TNuiImageStream *imageStream);
 
 signals:
-    void rightHandMoved(const QPointF &position);
+    void moved(const QPointF &position);
 
 protected:
     void handleNewFrame();

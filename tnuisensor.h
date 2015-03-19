@@ -6,8 +6,9 @@
 #include <Windows.h>
 #include <NuiApi.h>
 
+#include "tnuiskeletonstream.h"
+
 class TNuiImageStream;
-class TNuiSkeletonStream;
 
 class TNuiSensor : public QObject
 {
@@ -72,6 +73,9 @@ public:
     //Gets the Kinect sensor connection ID.
     QString deviceConnectionId() const {return m_deviceConnectionId;}
 
+    //Gets the skeleton stream
+    TNuiSkeletonStream *createSkeletonStream(TNuiSkeletonStream::TrackingFlags flags = TNuiSkeletonStream::EnableInNearRange | TNuiSkeletonStream::EnableSeatedSupport);
+
     /*
         NuiAccelerometerGetCurrentReading	Gets the accelerometer reading.
         NuiAudioArrayId	Gets the USB device name of the audio array.
@@ -125,6 +129,8 @@ private:
 
     INuiSensor *m_sensor;
     QString m_deviceConnectionId;
+
+    TNuiSkeletonStream *m_skeletonStream;
 };
 
 #endif // TNUISENSOR_H

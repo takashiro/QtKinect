@@ -18,7 +18,6 @@ public:
     };
     typedef ulong TrackingFlags;
 
-    TNuiSkeletonStream(TNuiSensor *sensor, TrackingFlags flags);
     ~TNuiSkeletonStream();
 
     bool open();
@@ -27,10 +26,12 @@ public:
 
     void setFlags(TrackingFlags flags) {m_flags |= flags;}
     void resetFlags(TrackingFlags flags) {m_flags &= ~flags;}
+    TrackingFlags flags() const {return m_flags;}
 
     void readFrame(NUI_SKELETON_FRAME &frame);
 
 protected:
+    TNuiSkeletonStream(TNuiSensor *sensor, TrackingFlags flags);
     bool processNewFrame();
 
     TrackingFlags m_flags;
