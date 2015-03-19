@@ -17,7 +17,9 @@ public:
     ~TNuiMouseArea();
 
 protected slots:
-    void onMouseMoved(const QPointF &pos);
+    void onLeftHandMoved(const QPointF &pos);
+    void onRightHandMoved(const QPointF &pos);
+    void onHandMoved(bool &isUnderHand, const QPointF &pos);
 
 signals:
     void entered();
@@ -25,7 +27,8 @@ signals:
     void touched();
 
 private:
-    bool m_isFocused;
+    bool m_isUnderLeftHand;
+    bool m_isUnderRightHand;
     QDateTime m_focusTimeOffset;
 };
 
