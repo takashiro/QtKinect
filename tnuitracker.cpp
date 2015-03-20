@@ -11,18 +11,10 @@ QPointF MapToScreen(const Vector4 &point, TNuiImageStream *stream) {
 
     NuiTransformSkeletonToDepthImage(point, &x, &y, &depth, resolution); // Returns coordinates in depth space
 
-    TNuiImageStream::ImageType type = stream->imageType();
-    if (TNuiImageStream::ColorType == type
-        || TNuiImageStream::ColorInfraredType == type
-        || TNuiImageStream::ColorRawBayerType == type
-        || TNuiImageStream::ColorRawYUVType == type
-        || TNuiImageStream::ColorYUVType == type) {
-        LONG backupX = x, backupY = y;
-        if (FAILED(NuiImageGetColorPixelCoordinatesFromDepthPixelAtResolution(resolution, resolution, &stream->frame().ViewArea, x, y, depth, &x, &y)))
-        {
-            x = backupX;
-            y = backupY;
-        }
+    LONG backupX = x, backupY = y;
+    if (FAILED(NuiImageGetColorPixelCoordinatesFromDepthPixelAtResolution(resolution, resolution, &stream->frame().ViewArea, x, y, depth, &x, &y))) {
+        x = backupX;
+        y = backupY;
     }
 
     /*ulong imageWidth, imageHeight;
@@ -35,10 +27,10 @@ QPointF MapToScreen(const Vector4 &point, TNuiImageStream *stream) {
     return QPointF(x, y);
 }
 
-TNuiTracker::TNuiTracker(TNuiSensor *sensor, TNuiImageStream *imageStream, NUI_SKELETON_POSITION_INDEX pos)
+TNuiTracker::TNuiTracker(TNuiSensor *sensor, NUI_SKELETON_POSITION_INDEX pos)
     : QObject(sensor)
     , m_skeletonStream(sensor->createSkeletonStream())
-    , m_imageStream(imageStream)
+    , m_colorStream(sensor->createImageStream(TNuiImageStream::ColorType))
     , m_pos(pos)
 {
     connect(m_skeletonStream, &TNuiSkeletonStream::readyRead, this, &TNuiTracker::handleNewFrame);
@@ -52,7 +44,7 @@ void TNuiTracker::handleNewFrame()
     //@todo: Track more players
     for (int i = 0; i < NUI_SKELETON_COUNT; i++) {
         if (frame.SkeletonData[i].dwTrackingID != 0){
-            QPointF pos = MapToScreen(frame.SkeletonData[i].SkeletonPositions[m_pos], m_imageStream);
+            QPointF pos = MapToScreen(frame.SkeletonData[i].SkeletonPositions[m_pos], m_colorStream);
             emit moved(pos);
             break;
         }

@@ -6,9 +6,8 @@
 #include <Windows.h>
 #include <NuiApi.h>
 
+#include "tnuiimagestream.h"
 #include "tnuiskeletonstream.h"
-
-class TNuiImageStream;
 
 class TNuiSensor : public QObject
 {
@@ -73,7 +72,10 @@ public:
     //Gets the Kinect sensor connection ID.
     QString deviceConnectionId() const {return m_deviceConnectionId;}
 
-    //Gets the skeleton stream
+    //Creates an image stream
+    TNuiImageStream *createImageStream(TNuiImageStream::ImageType type);
+
+    //Creates the skeleton stream
     TNuiSkeletonStream *createSkeletonStream(TNuiSkeletonStream::TrackingFlags flags = TNuiSkeletonStream::EnableInNearRange | TNuiSkeletonStream::EnableSeatedSupport);
 
     /*
@@ -131,6 +133,7 @@ private:
     QString m_deviceConnectionId;
 
     TNuiSkeletonStream *m_skeletonStream;
+    TNuiImageStream *m_imageStream[7];
 };
 
 #endif // TNUISENSOR_H

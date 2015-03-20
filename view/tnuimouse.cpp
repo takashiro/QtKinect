@@ -13,8 +13,7 @@ TNuiMouse::TNuiMouse(QQuickItem *parent)
 {
     TNuiSensor *sensor = SensorManager->sensor();
 
-    m_colorStream = new TNuiColorStream(sensor);
-    m_tracker = new TNuiTracker(sensor, m_colorStream);
+    m_tracker = new TNuiTracker(sensor);
     connect(m_tracker, &TNuiTracker::moved, this, &TNuiMouse::setPosition);
 
     setFlags(flags() | QQuickItem::ItemHasContents);

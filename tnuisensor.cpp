@@ -9,6 +9,8 @@ TNuiSensor::TNuiSensor(INuiSensor *sensor, QObject *parent)
     , m_sensor(sensor)
     , m_skeletonStream(nullptr)
 {
+    memset(m_imageStream, 0, sizeof(m_imageStream));
+
     m_sensor->AddRef();
     m_deviceConnectionId = WindowsUtil::toString(m_sensor->NuiDeviceConnectionId());
     connect(this, &TNuiSensor::stateChanged, this, &TNuiSensor::_onStateChanged);
@@ -17,6 +19,16 @@ TNuiSensor::TNuiSensor(INuiSensor *sensor, QObject *parent)
 TNuiSensor::~TNuiSensor()
 {
     m_sensor->Release();
+}
+
+TNuiImageStream *TNuiSensor::createImageStream(TNuiImageStream::ImageType type)
+{
+    TNuiImageStream *&stream = m_imageStream[type];
+    if (stream == nullptr) {
+        stream = new TNuiImageStream(this, type);
+        stream->open();
+    }
+    return stream;
 }
 
 TNuiSkeletonStream *TNuiSensor::createSkeletonStream(TNuiSkeletonStream::TrackingFlags flags)
