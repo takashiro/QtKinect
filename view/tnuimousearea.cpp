@@ -39,6 +39,7 @@ void TNuiMouseArea::onHandMoved(bool &isUnderHand, const QPointF &pos)
 
     if (rect.contains(pos)) {
         if (isUnderHand) {
+            //@to-do: use grip event instead
             QDateTime now = QDateTime::currentDateTime();
             if (m_focusTimeOffset.secsTo(now) >= 1) {
                 m_focusTimeOffset = now;
