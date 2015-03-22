@@ -5,8 +5,15 @@ TNuiImageStream::TNuiImageStream(TNuiSensor *parent, ImageType imageType)
     : TNuiStream(parent)
     , m_streamHandle(INVALID_HANDLE_VALUE)
     , m_imageType(imageType)
+    , m_image(640, 480, QImage::Format_RGB32)
     , m_imageResolution(Resolution_640x480)
 {
+}
+
+TNuiImageStream::~TNuiImageStream()
+{
+    m_imageMutex.lock();
+    m_imageMutex.unlock();
 }
 
 bool TNuiImageStream::open()
@@ -15,6 +22,14 @@ bool TNuiImageStream::open()
     if (m_isOpen)
         start();
     return m_isOpen;
+}
+
+QImage TNuiImageStream::readFrameImage()
+{
+    m_imageMutex.lock();
+    QImage image = m_image;
+    m_imageMutex.unlock();
+    return image;
 }
 
 bool TNuiImageStream::processNewFrame()
@@ -38,8 +53,20 @@ bool TNuiImageStream::processNewFrame()
 
     // Make sure we've received valid data
     if (lockedRect.Pitch != 0) {
-        m_data.resize(lockedRect.size);
-        memcpy_s(m_data.data(), lockedRect.size, lockedRect.pBits, lockedRect.size);
+        m_imageMutex.lock();
+        int k = 0;
+        int color;
+        uchar *rgba = reinterpret_cast<uchar *>(&color);
+        for (int j = 0; j < 480; j++) {
+            for (int i = 0; i < 640; i++) {
+                rgba[0] = lockedRect.pBits[k++];
+                rgba[1] = lockedRect.pBits[k++];
+                rgba[2] = lockedRect.pBits[k++];
+                rgba[3] = lockedRect.pBits[k++];
+                m_image.setPixel(i, j, color);
+            }
+        }
+        m_imageMutex.unlock();
         isValid = true;
     }
 

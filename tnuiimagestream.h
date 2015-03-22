@@ -3,6 +3,9 @@
 
 #include "tnuistream.h"
 
+#include <QMutex>
+#include <QImage>
+
 class TNuiImageStream : public TNuiStream
 {
 public:
@@ -28,19 +31,21 @@ public:
 
 
     bool open();
-    QVector<uchar> data() const {return m_data;}
     ImageType imageType() const {return m_imageType;}
     ImageResolution imageResolution() const {return m_imageResolution;}
     const NUI_IMAGE_FRAME &frame() const {return m_frame;}
+    QImage readFrameImage();
 
 protected:
     TNuiImageStream(TNuiSensor *parent, ImageType imageType);
+    ~TNuiImageStream();
 
     bool processNewFrame();
 
     HANDLE m_streamHandle;
-    QVector<uchar> m_data;
     NUI_IMAGE_FRAME m_frame;
+    QImage m_image;
+    QMutex m_imageMutex;
 
     ImageType m_imageType;
     ImageResolution m_imageResolution;

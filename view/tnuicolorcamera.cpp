@@ -11,11 +11,8 @@ TNuiColorCamera::TNuiColorCamera(QQuickItem *parent)
     , m_image(640, 480, QImage::Format_RGB32)
     , m_texture(nullptr)
 {
-    setWidth(640);
-    setHeight(480);
-    m_image.fill(Qt::black);
-
     setFlag(ItemHasContents, true);
+    m_image.fill(Qt::black);
 
     TNuiSensor *sensor = SensorManager->sensor();
     m_stream = sensor->createImageStream(TNuiImageStream::ColorType);
@@ -33,29 +30,22 @@ void TNuiColorCamera::tryOpenStream()
 
 void TNuiColorCamera::updateFrame()
 {
-    int color;
-    uchar *rgba = reinterpret_cast<uchar *>(&color);
-    QVector<uchar> data = m_stream->data();
-    int k = 0;
-    for (int j = 0; j < 480; j++) {
-        for (int i = 0; i < 640; i++) {
-            rgba[0] = data.at(k++);
-            rgba[1] = data.at(k++);
-            rgba[2] = data.at(k++);
-            rgba[3] = data.at(k++);
-            m_image.setPixel(i, j, color);
-        }
+    m_image = m_stream->readFrameImage();
+    QQuickWindow *mainWindow = window();
+    if (mainWindow) {
+        delete m_texture;
+        m_texture = mainWindow->createTextureFromImage(m_image);
+        update();
     }
-
-    delete m_texture;
-    m_texture = window()->createTextureFromImage(m_image);
-    update();
 }
 
 QSGNode *TNuiColorCamera::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
 {
+    if (m_texture == nullptr)
+        return node;
+
     QSGSimpleTextureNode *textureNode = static_cast<QSGSimpleTextureNode *>(node);
-    if (textureNode == nullptr)
+    if (!textureNode)
         textureNode = new QSGSimpleTextureNode;
     textureNode->setRect(boundingRect());
     textureNode->setTexture(m_texture);
