@@ -4,8 +4,9 @@
 #include "timage.h"
 
 class TNuiImageStream;
+class QSGTexture;
 
-class TNuiColorCamera : public TImage
+class TNuiColorCamera : public QQuickItem
 {
     Q_OBJECT
 
@@ -15,8 +16,11 @@ public:
 protected:
     void tryOpenStream();
     void updateFrame();
+    QSGNode *updatePaintNode(QSGNode *node, UpdatePaintNodeData *);
 
     TNuiImageStream *m_stream;
+    QImage m_image;
+    QSGTexture *m_texture;
 };
 
 #endif // TNUICOLORCAMERA_H

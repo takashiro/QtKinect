@@ -3,11 +3,19 @@
 #include "tnuiimagestream.h"
 #include "tnuisensormanager.h"
 
+#include <QQuickWindow>
+#include <QSGSimpleTextureNode>
+
 TNuiColorCamera::TNuiColorCamera(QQuickItem *parent)
-    : TImage(parent)
+    : QQuickItem(parent)
+    , m_image(640, 480, QImage::Format_RGB32)
+    , m_texture(nullptr)
 {
-    m_image = QImage(640, 480, QImage::Format_RGB32);
+    setWidth(640);
+    setHeight(480);
     m_image.fill(Qt::black);
+
+    setFlag(ItemHasContents, true);
 
     TNuiSensor *sensor = SensorManager->sensor();
     m_stream = sensor->createImageStream(TNuiImageStream::ColorType);
@@ -38,5 +46,18 @@ void TNuiColorCamera::updateFrame()
             m_image.setPixel(i, j, color);
         }
     }
+
+    delete m_texture;
+    m_texture = window()->createTextureFromImage(m_image);
     update();
+}
+
+QSGNode *TNuiColorCamera::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
+{
+    QSGSimpleTextureNode *textureNode = static_cast<QSGSimpleTextureNode *>(node);
+    if (textureNode == nullptr)
+        textureNode = new QSGSimpleTextureNode;
+    textureNode->setRect(boundingRect());
+    textureNode->setTexture(m_texture);
+    return textureNode;
 }

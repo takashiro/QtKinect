@@ -23,7 +23,6 @@ SOURCES += \
     $$PWD/windowsutil.cpp \
     $$PWD/tnuistream.cpp \
     $$PWD/tnuisensor.cpp \
-    $$PWD/view/timage.cpp \
     $$PWD/view/tnuicolorcamera.cpp \
     $$PWD/tnuisensormanager.cpp \
     $$PWD/tnuiskeletonstream.cpp \
@@ -38,7 +37,6 @@ HEADERS += \
     $$PWD/stdafx.h \
     $$PWD/tnuistream.h \
     $$PWD/tnuisensor.h \
-    $$PWD/view/timage.h \
     $$PWD/view/tnuicolorcamera.h \
     $$PWD/tnuisensormanager.h \
     $$PWD/tnuiskeletonstream.h \

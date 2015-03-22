@@ -7,7 +7,6 @@
 #include "tnuisensormanager.h"
 
 void initializeKinect(){
-    qmlRegisterType<TImage>("Kinect", 1, 0, "TImage");
     qmlRegisterType<TNuiColorCamera>("Kinect", 1, 0, "TNuiColorCamera");
     qmlRegisterType<TNuiTrackerItem>("Kinect", 1, 0, "TNuiTrackerItem");
     qmlRegisterType<TNuiMouseArea>("Kinect", 1, 0, "TNuiMouseArea");
