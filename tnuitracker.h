@@ -15,7 +15,10 @@ class TNuiTracker : public QObject
     Q_OBJECT
 
 public:
-    TNuiTracker(TNuiSensor *sensor, NUI_SKELETON_POSITION_INDEX pos = NUI_SKELETON_POSITION_HAND_RIGHT);
+    TNuiTracker(TNuiSensor *sensor, NUI_SKELETON_POSITION_INDEX target = NUI_SKELETON_POSITION_COUNT);
+
+    void setTarget(NUI_SKELETON_POSITION_INDEX target) { m_target = target; }
+    NUI_SKELETON_POSITION_INDEX target() const { return m_target; }
 
 signals:
     void moved(const QPointF &position);
@@ -25,7 +28,7 @@ protected:
 
     TNuiSkeletonStream *m_skeletonStream;
     TNuiImageStream *m_colorStream;
-    NUI_SKELETON_POSITION_INDEX m_pos;
+    NUI_SKELETON_POSITION_INDEX m_target;
 };
 
 #endif // TNUITRACKER_H
