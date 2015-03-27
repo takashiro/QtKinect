@@ -1,6 +1,5 @@
 #include "kinectglobal.h"
 
-#include "timage.h"
 #include "tnuicolorcamera.h"
 #include "tnuitrackeritem.h"
 #include "tnuimousearea.h"

@@ -55,7 +55,7 @@ bool TNuiImageStream::processNewFrame()
     if (lockedRect.Pitch != 0) {
         m_imageMutex.lock();
         int k = 0;
-        int color;
+        uint color;
         uchar *rgba = reinterpret_cast<uchar *>(&color);
         for (int j = 0; j < 480; j++) {
             for (int i = 0; i < 640; i++) {

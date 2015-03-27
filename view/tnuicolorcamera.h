@@ -1,7 +1,8 @@
 #ifndef TNUICOLORCAMERA_H
 #define TNUICOLORCAMERA_H
 
-#include "timage.h"
+#include <QQuickItem>
+#include <QImage>
 
 class TNuiImageStream;
 class QSGTexture;
