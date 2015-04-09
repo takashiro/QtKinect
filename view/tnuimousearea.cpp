@@ -13,8 +13,8 @@ TNuiMouseArea::TNuiMouseArea(QQuickItem *parent)
 {
     TNuiSensor *sensor = SensorManager->sensor();
 
-    TNuiTracker *leftTracker = new TNuiTracker(sensor, NUI_SKELETON_POSITION_HAND_LEFT);
-    TNuiTracker *rightTracker = new TNuiTracker(sensor, NUI_SKELETON_POSITION_HAND_RIGHT);
+    static TNuiTracker *leftTracker = new TNuiTracker(sensor, NUI_SKELETON_POSITION_HAND_LEFT);
+    static TNuiTracker *rightTracker = new TNuiTracker(sensor, NUI_SKELETON_POSITION_HAND_RIGHT);
     connect(leftTracker, &TNuiTracker::moved, this, &TNuiMouseArea::onLeftHandMoved);
     connect(rightTracker, &TNuiTracker::moved, this, &TNuiMouseArea::onRightHandMoved);
 }

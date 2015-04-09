@@ -5,39 +5,42 @@ TNuiImageStream::TNuiImageStream(TNuiSensor *parent, ImageType imageType)
     : TNuiStream(parent)
     , m_streamHandle(INVALID_HANDLE_VALUE)
     , m_imageType(imageType)
-    , m_image(640, 480, QImage::Format_RGB32)
+    , m_dataSize(640 * 480 * 4)
+    , m_data(new uchar[m_dataSize])
     , m_imageResolution(Resolution_640x480)
 {
 }
 
 TNuiImageStream::~TNuiImageStream()
 {
-    m_imageMutex.lock();
-    m_imageMutex.unlock();
+    m_dataMutex.lock();
+    delete[] m_data;
+    m_dataMutex.unlock();
 }
 
 bool TNuiImageStream::open()
 {
-    m_isOpen = m_sensor->_openImageStream(this, 0, 2);
+    INuiSensor *sensor = m_sensor->nativeSensor();
+    m_isOpen = (S_OK == sensor->NuiImageStreamOpen(
+                    (NUI_IMAGE_TYPE) m_imageType,
+                    (NUI_IMAGE_RESOLUTION) m_imageResolution,
+                    0,
+                    2,
+                    m_frameReadyEvent,
+                    &m_streamHandle));
     if (m_isOpen)
         start();
     return m_isOpen;
-}
-
-QImage TNuiImageStream::readFrameImage()
-{
-    m_imageMutex.lock();
-    QImage image = m_image;
-    m_imageMutex.unlock();
-    return image;
 }
 
 bool TNuiImageStream::processNewFrame()
 {
     bool isValid = false;
 
+    INuiSensor *sensor = m_sensor->nativeSensor();
+
     // Attempt to get the color frame
-    if (!m_sensor->_readImageFrame(this, 0, m_frame))
+    if (S_OK != sensor->NuiImageStreamGetNextFrame(m_streamHandle, 0, &m_frame))
         return false;
 
     if (m_paused) {
@@ -53,20 +56,9 @@ bool TNuiImageStream::processNewFrame()
 
     // Make sure we've received valid data
     if (lockedRect.Pitch != 0) {
-        m_imageMutex.lock();
-        int k = 0;
-        uint color;
-        uchar *rgba = reinterpret_cast<uchar *>(&color);
-        for (int j = 0; j < 480; j++) {
-            for (int i = 0; i < 640; i++) {
-                rgba[0] = lockedRect.pBits[k++];
-                rgba[1] = lockedRect.pBits[k++];
-                rgba[2] = lockedRect.pBits[k++];
-                rgba[3] = lockedRect.pBits[k++];
-                m_image.setPixel(i, j, color);
-            }
-        }
-        m_imageMutex.unlock();
+        m_dataMutex.lock();
+        memcpy_s(m_data, m_dataSize, lockedRect.pBits, lockedRect.size);
+        m_dataMutex.unlock();
         isValid = true;
     }
 
@@ -74,6 +66,27 @@ bool TNuiImageStream::processNewFrame()
     pTexture->UnlockRect(0);
 
 ReleaseFrame:
-    m_sensor->_releaseImageFrame(this, m_frame);
+    sensor->NuiImageStreamReleaseFrame(m_streamHandle, &m_frame);
     return isValid;
+}
+
+QImage TNuiColorStream::readImage()
+{
+    QImage image(640, 480, QImage::Format_RGB32);
+    int k = 0;
+    uint color;
+    uchar *rgba = reinterpret_cast<uchar *>(&color);
+
+    m_dataMutex.lock();
+    for (int j = 0; j < 480; j++) {
+        for (int i = 0; i < 640; i++) {
+            rgba[0] = m_data[k++];
+            rgba[1] = m_data[k++];
+            rgba[2] = m_data[k++];
+            rgba[3] = m_data[k++];
+            image.setPixel(i, j, color);
+        }
+    }
+    m_dataMutex.unlock();
+    return image;
 }

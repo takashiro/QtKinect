@@ -15,7 +15,7 @@ TNuiColorCamera::TNuiColorCamera(QQuickItem *parent)
     m_image.fill(Qt::black);
 
     TNuiSensor *sensor = SensorManager->sensor();
-    m_stream = sensor->createImageStream(TNuiImageStream::ColorType);
+    m_stream = new TNuiColorStream(sensor);
     connect(sensor, &TNuiSensor::stateChanged, this, &TNuiColorCamera::tryOpenStream);
     tryOpenStream();
 }
@@ -30,7 +30,7 @@ void TNuiColorCamera::tryOpenStream()
 
 void TNuiColorCamera::updateFrame()
 {
-    m_image = m_stream->readFrameImage();
+    m_image = m_stream->readImage();
     QQuickWindow *mainWindow = window();
     if (mainWindow) {
         delete m_texture;

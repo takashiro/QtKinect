@@ -4,7 +4,7 @@
 #include <QQuickItem>
 #include <QImage>
 
-class TNuiImageStream;
+class TNuiColorStream;
 class QSGTexture;
 
 class TNuiColorCamera : public QQuickItem
@@ -19,7 +19,7 @@ protected:
     void updateFrame();
     QSGNode *updatePaintNode(QSGNode *node, UpdatePaintNodeData *);
 
-    TNuiImageStream *m_stream;
+    TNuiColorStream *m_stream;
     QImage m_image;
     QSGTexture *m_texture;
 };

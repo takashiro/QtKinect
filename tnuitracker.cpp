@@ -29,11 +29,12 @@ QPointF MapToScreen(const Vector4 &point, TNuiImageStream *stream) {
 
 TNuiTracker::TNuiTracker(TNuiSensor *sensor, NUI_SKELETON_POSITION_INDEX target)
     : QObject(sensor)
-    , m_skeletonStream(sensor->createSkeletonStream())
-    , m_colorStream(sensor->createImageStream(TNuiImageStream::ColorType))
+    , m_skeletonStream(new TNuiSkeletonStream(sensor))
+    , m_colorStream(new TNuiColorStream(sensor))
     , m_target(target)
 {
     connect(m_skeletonStream, &TNuiSkeletonStream::readyRead, this, &TNuiTracker::handleNewFrame);
+    m_skeletonStream->open();
 }
 
 void TNuiTracker::handleNewFrame()

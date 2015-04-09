@@ -1,47 +1,80 @@
 #include "tnuiskeletonstream.h"
 #include "tnuisensor.h"
 
-TNuiSkeletonStream::TNuiSkeletonStream(TNuiSensor *sensor, TrackingFlags flags)
-    : TNuiStream(sensor)
-    , m_flags(flags)
+#include <QAtomicInt>
+
+TNuiSkeletonStreamPrivate::TNuiSkeletonStreamPrivate(TNuiSensor *sensor)
+   : TNuiStream(sensor)
 {
+
 }
 
-TNuiSkeletonStream::~TNuiSkeletonStream()
+bool TNuiSkeletonStreamPrivate::open()
 {
-    m_sensor->_closeSkeletonStream();
+   if (isRunning())
+       return true;
+
+   bool open = (S_OK == m_sensor->nativeSensor()->NuiSkeletonTrackingEnable(m_frameReadyEvent, flags));
+   if (open)
+       start();
+   return open;
+}
+
+bool TNuiSkeletonStreamPrivate::processNewFrame()
+{
+   // Attempt to get the color frame
+   frameMutex.lock();
+   bool isValid = (S_OK == m_sensor->nativeSensor()->NuiSkeletonGetNextFrame(0, &frame));
+   frameMutex.unlock();
+   return isValid;
+}
+
+TNuiSkeletonStreamPrivate *TNuiSkeletonStream::p_ptr = nullptr;
+
+TNuiSkeletonStream::TNuiSkeletonStream(TNuiSensor *sensor, TrackingFlags flags)
+    : QObject(sensor)
+{
+    if (p_ptr == nullptr)
+        p_ptr = new TNuiSkeletonStreamPrivate(sensor);
+
+    p_ptr->ref.ref();
+    p_ptr->flags = flags;
+    connect(p_ptr, &TNuiSkeletonStreamPrivate::readyRead, this, &TNuiSkeletonStream::readyRead);
 }
 
 bool TNuiSkeletonStream::open()
 {
-    bool open = m_sensor->_openSkeletionStream(this, m_flags);
-    if (open)
-        start();
-    return open;
+    return p_ptr->open();
 }
 
 bool TNuiSkeletonStream::close()
 {
-    return m_sensor->_closeSkeletonStream();
+    return S_OK == p_ptr->m_sensor->nativeSensor()->NuiSkeletonTrackingDisable();
 }
 
 bool TNuiSkeletonStream::reopen()
 {
-    return m_sensor->_closeSkeletonStream() && m_sensor->_openSkeletionStream(this, m_flags);
+    return close() && open();
+}
+
+void TNuiSkeletonStream::setFlags(TrackingFlags flags)
+{
+    p_ptr->flags |= flags;
+}
+
+void TNuiSkeletonStream::resetFlags(TrackingFlags flags)
+{
+    p_ptr->flags &= ~flags;
+}
+
+TNuiSkeletonStream::TrackingFlags TNuiSkeletonStream::flags() const
+{
+    return p_ptr->flags;
 }
 
 void TNuiSkeletonStream::readFrame(NUI_SKELETON_FRAME &frame)
 {
-    m_frameMutex.lock();
-    frame = m_frame;
-    m_frameMutex.unlock();
-}
-
-bool TNuiSkeletonStream::processNewFrame()
-{
-    // Attempt to get the color frame
-    m_frameMutex.lock();
-    bool isValid = m_sensor->_readSkeletonFrame(0, m_frame);
-    m_frameMutex.unlock();
-    return isValid;
+    p_ptr->frameMutex.lock();
+    frame = p_ptr->frame;
+    p_ptr->frameMutex.unlock();
 }

@@ -15,8 +15,6 @@ class TNuiSensor : public QObject
 
 public:
     friend class TNuiSensorManager;
-    friend class TNuiImageStream;
-    friend class TNuiSkeletonStream;
 
     enum State{
         ConnectedState = S_OK,
@@ -54,6 +52,8 @@ public:
     TNuiSensor(INuiSensor *sensor, QObject *parent = 0);
     ~TNuiSensor();
 
+    INuiSensor *nativeSensor() const { return m_sensor; }
+
     //Initializes the Kinect.
     void initialize(uint flags) {m_sensor->NuiInitialize(flags);}
 
@@ -71,12 +71,6 @@ public:
 
     //Gets the Kinect sensor connection ID.
     QString deviceConnectionId() const {return m_deviceConnectionId;}
-
-    //Creates an image stream
-    TNuiImageStream *createImageStream(TNuiImageStream::ImageType type);
-
-    //Creates the skeleton stream
-    TNuiSkeletonStream *createSkeletonStream(TNuiSkeletonStream::TrackingFlags flags = TNuiSkeletonStream::EnableInNearRange | TNuiSkeletonStream::EnableSeatedSupport);
 
     /*
         NuiAccelerometerGetCurrentReading	Gets the accelerometer reading.
@@ -106,22 +100,6 @@ signals:
     void disconnected();
 
 protected:
-    //Opens an image stream
-    bool _openImageStream(TNuiImageStream *stream, ulong imageFrameFlags, ulong frameLimit);
-
-    //Gets the next frame of data.
-    bool _readImageFrame(TNuiImageStream *stream, ulong msecondsToWait, NUI_IMAGE_FRAME &ppcImageFrame);
-
-    //Releases a frame of data.
-    bool _releaseImageFrame(TNuiImageStream *stream, NUI_IMAGE_FRAME &frame);
-
-    bool _openSkeletionStream(TNuiSkeletonStream *stream, ulong flags);
-    bool _closeSkeletonStream();
-
-    //Gets the next frame of data from the skeleton stream.
-    bool _readSkeletonFrame(ulong msecondsToWait, NUI_SKELETON_FRAME &frame);
-    //NuiSkeletonSetTrackedSkeletons	Sets an array of identifiers (IDs) for skeleton tracking.
-
     void _updateState();
 
     State m_state;
@@ -131,9 +109,6 @@ private:
 
     INuiSensor *m_sensor;
     QString m_deviceConnectionId;
-
-    TNuiSkeletonStream *m_skeletonStream;
-    TNuiImageStream *m_imageStream[7];
 };
 
 #endif // TNUISENSOR_H

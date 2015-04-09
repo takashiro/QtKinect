@@ -5,8 +5,12 @@
 
 class TNuiSensor;
 
-class TNuiSkeletonStream : public TNuiStream
+class TNuiSkeletonStreamPrivate;
+
+class TNuiSkeletonStream : public QObject
 {
+    Q_OBJECT
+
 public:
     friend class TNuiSensor;
 
@@ -18,25 +22,41 @@ public:
     };
     typedef ulong TrackingFlags;
 
-    ~TNuiSkeletonStream();
+    TNuiSkeletonStream(TNuiSensor *sensor, TrackingFlags flags = EnableInNearRange | EnableSeatedSupport);
 
     bool open();
     bool close();
     bool reopen();
 
-    void setFlags(TrackingFlags flags) {m_flags |= flags;}
-    void resetFlags(TrackingFlags flags) {m_flags &= ~flags;}
-    TrackingFlags flags() const {return m_flags;}
+    void setFlags(TrackingFlags flags);
+    void resetFlags(TrackingFlags flags);
+    TrackingFlags flags() const;
 
     void readFrame(NUI_SKELETON_FRAME &frame);
 
-protected:
-    TNuiSkeletonStream(TNuiSensor *sensor, TrackingFlags flags);
-    bool processNewFrame();
+signals:
+    void readyRead();
 
-    TrackingFlags m_flags;
-    NUI_SKELETON_FRAME m_frame;
-    QMutex m_frameMutex;
+protected:
+    static TNuiSkeletonStreamPrivate *p_ptr;
+};
+
+class TNuiSkeletonStreamPrivate: public TNuiStream
+{
+   Q_OBJECT
+
+   friend class TNuiSkeletonStream;
+
+protected:
+   TNuiSkeletonStreamPrivate(TNuiSensor *sensor);
+
+   bool open();
+   bool processNewFrame();
+
+   TNuiSkeletonStream::TrackingFlags flags;
+   NUI_SKELETON_FRAME frame;
+   QMutex frameMutex;
+   QAtomicInt ref;
 };
 
 #endif // TNUISKELETONSTREAM_H

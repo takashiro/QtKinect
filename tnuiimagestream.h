@@ -29,23 +29,24 @@ public:
         Resolution_1280x960 = NUI_IMAGE_RESOLUTION_1280x960
     };
 
-
-    bool open();
-    ImageType imageType() const {return m_imageType;}
-    ImageResolution imageResolution() const {return m_imageResolution;}
-    const NUI_IMAGE_FRAME &frame() const {return m_frame;}
-    QImage readFrameImage();
-
-protected:
     TNuiImageStream(TNuiSensor *parent, ImageType imageType);
     ~TNuiImageStream();
 
+    bool open();
+    ImageType imageType() const { return m_imageType; }
+    ImageResolution imageResolution() const { return m_imageResolution; }
+    const NUI_IMAGE_FRAME &frame() const { return m_frame; }
+    const uchar *data() const { return m_data; }
+    uint dataSize() const { return m_dataSize; }
+
+protected:
     bool processNewFrame();
 
     HANDLE m_streamHandle;
     NUI_IMAGE_FRAME m_frame;
-    QImage m_image;
-    QMutex m_imageMutex;
+    uchar *m_data;
+    uint m_dataSize;
+    QMutex m_dataMutex;
 
     ImageType m_imageType;
     ImageResolution m_imageResolution;
@@ -58,6 +59,8 @@ public:
         : TNuiImageStream(parent, ColorType)
     {
     }
+
+    QImage readImage();
 };
 
 class TNuiDepthStream : public TNuiImageStream
