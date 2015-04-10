@@ -1,14 +1,15 @@
 #include "tnuiimagestream.h"
 #include "tnuisensor.h"
 
-TNuiImageStream::TNuiImageStream(TNuiSensor *parent, ImageType imageType)
+TNuiImageStream::TNuiImageStream(TNuiSensor *parent, Type imageType)
     : TNuiStream(parent)
     , m_streamHandle(INVALID_HANDLE_VALUE)
     , m_imageType(imageType)
     , m_dataSize(640 * 480 * 4)
-    , m_data(new uchar[m_dataSize])
     , m_imageResolution(Resolution_640x480)
+    , m_flags(0)
 {
+    m_data = new uchar[m_dataSize];
 }
 
 TNuiImageStream::~TNuiImageStream()
@@ -24,7 +25,7 @@ bool TNuiImageStream::open()
     m_isOpen = (S_OK == sensor->NuiImageStreamOpen(
                     (NUI_IMAGE_TYPE) m_imageType,
                     (NUI_IMAGE_RESOLUTION) m_imageResolution,
-                    0,
+                    m_flags,
                     2,
                     m_frameReadyEvent,
                     &m_streamHandle));
@@ -38,6 +39,15 @@ void TNuiImageStream::readFrame(NUI_IMAGE_FRAME &frame)
     m_frameMutex.lock();
     frame = m_frame;
     m_frameMutex.unlock();
+}
+
+void TNuiImageStream::setFlag(Flag flag, bool enabled)
+{
+    if (enabled) {
+        m_flags |= flag;
+    } else {
+        m_flags &= ~flag;
+    }
 }
 
 bool TNuiImageStream::processNewFrame()
@@ -59,11 +69,13 @@ bool TNuiImageStream::processNewFrame()
         goto ReleaseFrame;
     }
 
-    INuiFrameTexture *pTexture = m_frame.pFrameTexture;
+    INuiFrameTexture *texture = readFrameTexture();
+    if (texture == nullptr)
+        return false;
 
     // Lock the frame data so the Kinect knows not to modify it while we are reading it
     NUI_LOCKED_RECT lockedRect;
-    pTexture->LockRect(0, &lockedRect, NULL, 0);
+    texture->LockRect(0, &lockedRect, NULL, 0);
 
     // Make sure we've received valid data
     if (lockedRect.Pitch != 0) {
@@ -74,7 +86,7 @@ bool TNuiImageStream::processNewFrame()
     }
 
     // Unlock frame data
-    pTexture->UnlockRect(0);
+    texture->UnlockRect(0);
 
 ReleaseFrame:
     m_frameMutex.lock();
@@ -109,4 +121,22 @@ QImage TNuiColorStream::readImage()
     }
     m_dataMutex.unlock();
     return image;
+}
+
+INuiFrameTexture *TNuiColorStream::readFrameTexture()
+{
+    return m_frame.pFrameTexture;
+}
+
+INuiFrameTexture *TNuiDepthStream::readFrameTexture()
+{
+    INuiFrameTexture *texture;
+    BOOL nearMode = hasFlag(EnableNearMode) ? TRUE : FALSE;
+
+    // Attempt to get the extended depth texture
+    HRESULT hr = m_sensor->nativeSensor()->NuiImageFrameGetDepthImagePixelFrameTexture(m_streamHandle, &m_frame, &nearMode, &texture);
+    if (FAILED(hr))
+        return nullptr;
+
+    return texture;
 }

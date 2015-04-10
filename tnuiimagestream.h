@@ -11,17 +11,17 @@ class TNuiImageStream : public TNuiStream
 public:
     friend class TNuiSensor;
 
-    enum ImageType{
-        DepthAndPlayerIndexType = NUI_IMAGE_TYPE_DEPTH_AND_PLAYER_INDEX,
-        ColorType = NUI_IMAGE_TYPE_COLOR,
-        ColorYUVType = NUI_IMAGE_TYPE_COLOR_YUV,
-        ColorRawYUVType = NUI_IMAGE_TYPE_COLOR_RAW_YUV,
-        DepthType = NUI_IMAGE_TYPE_DEPTH,
-        ColorInfraredType = NUI_IMAGE_TYPE_COLOR_INFRARED,
-        ColorRawBayerType = NUI_IMAGE_TYPE_COLOR_RAW_BAYER
+    enum Type{
+        DepthAndPlayerIndex = NUI_IMAGE_TYPE_DEPTH_AND_PLAYER_INDEX,
+        Color = NUI_IMAGE_TYPE_COLOR,
+        ColorYUV = NUI_IMAGE_TYPE_COLOR_YUV,
+        ColorRawYUV = NUI_IMAGE_TYPE_COLOR_RAW_YUV,
+        Depth = NUI_IMAGE_TYPE_DEPTH,
+        ColorInfrared = NUI_IMAGE_TYPE_COLOR_INFRARED,
+        ColorRawBayer = NUI_IMAGE_TYPE_COLOR_RAW_BAYER
     };
 
-    enum ImageResolution{
+    enum Resolution{
         InvalidResolution = NUI_IMAGE_RESOLUTION_INVALID,
         Resolution_80x60 = NUI_IMAGE_RESOLUTION_80x60,
         Resolution_320x240 = NUI_IMAGE_RESOLUTION_320x240,
@@ -29,19 +29,41 @@ public:
         Resolution_1280x960 = NUI_IMAGE_RESOLUTION_1280x960
     };
 
-    TNuiImageStream(TNuiSensor *parent, ImageType imageType);
+    enum Flag{
+        DepthMaximum = NUI_IMAGE_DEPTH_MAXIMUM,
+        DepthMinimum = NUI_IMAGE_DEPTH_MINIMUM,
+        DepthNoValue = NUI_IMAGE_DEPTH_NO_VALUE,
+        DistinctOverflowDepthValues = NUI_IMAGE_STREAM_FLAG_DISTINCT_OVERFLOW_DEPTH_VALUES,
+        EnableNearMode = NUI_IMAGE_STREAM_FLAG_ENABLE_NEAR_MODE,
+        SuppressNoFrameData = NUI_IMAGE_STREAM_FLAG_SUPPRESS_NO_FRAME_DATA,
+        FrameLimitMaximum = NUI_IMAGE_STREAM_FRAME_LIMIT_MAXIMUM,
+        PlayerIndexShift = NUI_IMAGE_PLAYER_INDEX_SHIFT,
+        PlayerIndexMask = NUI_IMAGE_PLAYER_INDEX_MASK
+    };
+    typedef uint Flags;
+
+    TNuiImageStream(TNuiSensor *parent, Type imageType);
     ~TNuiImageStream();
 
     bool open();
-    ImageType imageType() const { return m_imageType; }
-    ImageResolution imageResolution() const { return m_imageResolution; }
+    Type imageType() const { return m_imageType; }
+    Resolution imageResolution() const { return m_imageResolution; }
     void readFrame(NUI_IMAGE_FRAME &frame);
-    const uchar *data() const { return m_data; }
-    uint dataSize() const { return m_dataSize; }
     HANDLE handle() const { return m_streamHandle; }
+
+    void lockData() { m_dataMutex.lock(); }
+    const uchar *data() const { return m_data; }
+    void unlockData() { m_dataMutex.unlock(); }
+    uint dataSize() const { return m_dataSize; }
+
+    void setFlags(Flags flags) { m_flags = flags; }
+    void setFlag(Flag flag, bool enabled);
+    bool hasFlag(Flag flag) { return (m_flags & flag) == flag; }
 
 protected:
     bool processNewFrame();
+
+    virtual INuiFrameTexture *readFrameTexture() = 0;
 
     HANDLE m_streamHandle;
     uchar *m_data;
@@ -51,8 +73,9 @@ protected:
     NUI_IMAGE_FRAME m_frame;
     QMutex m_frameMutex;
 
-    ImageType m_imageType;
-    ImageResolution m_imageResolution;
+    Type m_imageType;
+    Resolution m_imageResolution;
+    Flags m_flags;
 };
 
 class TNuiColorStream : public TNuiImageStream
@@ -61,11 +84,14 @@ class TNuiColorStream : public TNuiImageStream
 
 public:
     TNuiColorStream(TNuiSensor *parent)
-        : TNuiImageStream(parent, ColorType)
+        : TNuiImageStream(parent, Color)
     {
     }
 
     QImage readImage();
+
+protected:
+    INuiFrameTexture *readFrameTexture();
 };
 
 class TNuiDepthStream : public TNuiImageStream
@@ -73,10 +99,13 @@ class TNuiDepthStream : public TNuiImageStream
     Q_OBJECT
 
 public:
-    TNuiDepthStream(TNuiSensor *parent)
-        : TNuiImageStream(parent, DepthType)
+    TNuiDepthStream(TNuiSensor *parent, bool enablePlayerIndex = false)
+        : TNuiImageStream(parent, enablePlayerIndex ? DepthAndPlayerIndex : Depth)
     {
     }
+
+protected:
+    INuiFrameTexture *readFrameTexture();
 };
 
 #endif // TNUIIMAGESTREAM_H
