@@ -30,7 +30,8 @@ SOURCES += \
     $$PWD/tnuitracker.cpp \
     $$PWD/view/tnuimousearea.cpp \
     $$PWD/kinectglobal.cpp \
-    $$PWD/view/tnuitrackeritem.cpp
+    $$PWD/view/tnuitrackeritem.cpp \
+    $$PWD/tnuibackgroundremovedcolorstream.cpp
 
 HEADERS += \
     $$PWD/windowsutil.h \
@@ -44,4 +45,5 @@ HEADERS += \
     $$PWD/tnuitracker.h \
     $$PWD/view/tnuimousearea.h \
     $$PWD/kinectglobal.h \
-    $$PWD/view/tnuitrackeritem.h
+    $$PWD/view/tnuitrackeritem.h \
+    $$PWD/tnuibackgroundremovedcolorstream.h

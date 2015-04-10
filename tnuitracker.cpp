@@ -4,7 +4,7 @@
 #include "tnuisensor.h"
 
 QPointF MapToScreen(const Vector4 &point, TNuiImageStream *stream) {
-    const NUI_IMAGE_RESOLUTION resolution = (NUI_IMAGE_RESOLUTION) stream->imageResolution();
+    const NUI_IMAGE_RESOLUTION resolution = (NUI_IMAGE_RESOLUTION) stream->resolution();
     long x;
     long y;
     ushort depth;

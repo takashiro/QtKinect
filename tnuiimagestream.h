@@ -42,17 +42,20 @@ public:
     };
     typedef uint Flags;
 
-    TNuiImageStream(TNuiSensor *parent, Type imageType);
+    TNuiImageStream(TNuiSensor *parent, Type type);
     ~TNuiImageStream();
 
     bool open();
-    Type imageType() const { return m_imageType; }
-    Resolution imageResolution() const { return m_imageResolution; }
+    Type type() const { return m_type; }
+
+    void setResolution(Resolution resolution) { m_resolution = resolution; }
+    Resolution resolution() const { return m_resolution; }
+
     void readFrame(NUI_IMAGE_FRAME &frame);
     HANDLE handle() const { return m_streamHandle; }
 
     void lockData() { m_dataMutex.lock(); }
-    const uchar *data() const { return m_data; }
+    const uchar *data() const { return m_outputData; }
     void unlockData() { m_dataMutex.unlock(); }
     uint dataSize() const { return m_dataSize; }
 
@@ -69,15 +72,16 @@ protected:
     virtual INuiFrameTexture *readFrameTexture() = 0;
 
     HANDLE m_streamHandle;
-    uchar *m_data;
+    uchar *m_inputData;
+    uchar *m_outputData;
     uint m_dataSize;
     QMutex m_dataMutex;
 
     NUI_IMAGE_FRAME m_frame;
     QMutex m_frameMutex;
 
-    Type m_imageType;
-    Resolution m_imageResolution;
+    Type m_type;
+    Resolution m_resolution;
     Flags m_flags;
     ulong m_frameBufferSize;
 };

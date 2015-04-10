@@ -4,19 +4,19 @@
 TNuiImageStream::TNuiImageStream(TNuiSensor *parent, Type imageType)
     : TNuiStream(parent)
     , m_streamHandle(INVALID_HANDLE_VALUE)
-    , m_imageType(imageType)
+    , m_type(imageType)
     , m_dataSize(640 * 480 * 4)
-    , m_imageResolution(Resolution_640x480)
+    , m_resolution(Resolution_640x480)
     , m_flags(0)
     , m_frameBufferSize(2)
 {
-    m_data = new uchar[m_dataSize];
+    m_inputData = m_outputData = new uchar[m_dataSize];
 }
 
 TNuiImageStream::~TNuiImageStream()
 {
     m_dataMutex.lock();
-    delete[] m_data;
+    delete[] m_outputData;
     m_dataMutex.unlock();
 }
 
@@ -24,8 +24,8 @@ bool TNuiImageStream::open()
 {
     INuiSensor *sensor = m_sensor->nativeSensor();
     m_isOpen = (S_OK == sensor->NuiImageStreamOpen(
-                    (NUI_IMAGE_TYPE) m_imageType,
-                    (NUI_IMAGE_RESOLUTION) m_imageResolution,
+                    (NUI_IMAGE_TYPE) m_type,
+                    (NUI_IMAGE_RESOLUTION) m_resolution,
                     m_flags,
                     m_frameBufferSize,
                     m_frameReadyEvent,
@@ -89,7 +89,7 @@ bool TNuiImageStream::processNewFrame()
     // Make sure we've received valid data
     if (lockedRect.Pitch != 0) {
         m_dataMutex.lock();
-        memcpy_s(m_data, m_dataSize, lockedRect.pBits, lockedRect.size);
+        memcpy_s(m_inputData, m_dataSize, lockedRect.pBits, lockedRect.size);
         m_dataMutex.unlock();
         isValid = true;
     }
@@ -105,7 +105,7 @@ ReleaseFrame:
     int maxi = 640 * 480 * 4;
     m_dataMutex.lock();
     for (int i = 3; i < maxi; i += 4)
-        m_data[i] = 255;
+        m_inputData[i] = 255;
     m_dataMutex.unlock();
 
     return isValid;
@@ -121,10 +121,10 @@ QImage TNuiColorStream::readImage()
     m_dataMutex.lock();
     for (int j = 0; j < 480; j++) {
         for (int i = 0; i < 640; i++) {
-            rgba[0] = m_data[k++];
-            rgba[1] = m_data[k++];
-            rgba[2] = m_data[k++];
-            rgba[3] = m_data[k++];
+            rgba[0] = m_outputData[k++];
+            rgba[1] = m_outputData[k++];
+            rgba[2] = m_outputData[k++];
+            rgba[3] = m_outputData[k++];
             image.setPixel(i, j, color);
         }
     }

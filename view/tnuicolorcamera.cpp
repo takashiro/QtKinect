@@ -1,7 +1,7 @@
 #include "tnuicolorcamera.h"
 #include "tnuisensor.h"
-#include "tnuiimagestream.h"
 #include "tnuisensormanager.h"
+#include "tnuibackgroundremovedcolorstream.h"
 
 #include <QQuickWindow>
 #include <QSGSimpleTextureNode>
@@ -15,7 +15,7 @@ TNuiColorCamera::TNuiColorCamera(QQuickItem *parent)
     m_image.fill(Qt::black);
 
     TNuiSensor *sensor = SensorManager->sensor();
-    m_stream = new TNuiColorStream(sensor);
+    m_stream = new TNuiBackgroundRemovedColorStream(sensor);
     connect(sensor, &TNuiSensor::stateChanged, this, &TNuiColorCamera::tryOpenStream);
     tryOpenStream();
 }
