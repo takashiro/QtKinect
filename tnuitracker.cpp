@@ -12,7 +12,9 @@ QPointF MapToScreen(const Vector4 &point, TNuiImageStream *stream) {
     NuiTransformSkeletonToDepthImage(point, &x, &y, &depth, resolution); // Returns coordinates in depth space
 
     LONG backupX = x, backupY = y;
-    if (FAILED(NuiImageGetColorPixelCoordinatesFromDepthPixelAtResolution(resolution, resolution, &stream->frame().ViewArea, x, y, depth, &x, &y))) {
+    NUI_IMAGE_FRAME frame;
+    stream->readFrame(frame);
+    if (FAILED(NuiImageGetColorPixelCoordinatesFromDepthPixelAtResolution(resolution, resolution, &frame.ViewArea, x, y, depth, &x, &y))) {
         x = backupX;
         y = backupY;
     }

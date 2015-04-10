@@ -5,10 +5,10 @@
 TNuiStream::TNuiStream(TNuiSensor *parent)
     : QThread(parent)
     , m_sensor(parent)
-    , m_frameReadyEvent(CreateEventW(nullptr, TRUE, FALSE, nullptr))
+    , m_frameReadyEvent(CreateEvent(NULL, TRUE, FALSE, NULL))
     , m_paused(false)
     , m_isOpen(false)
-    , m_stopThreadEvent(CreateEventW(nullptr, TRUE, FALSE, nullptr))
+    , m_stopThreadEvent(CreateEvent(NULL, TRUE, FALSE, NULL))
 {
 }
 
@@ -17,6 +17,8 @@ TNuiStream::~TNuiStream()
     SetEvent(m_stopThreadEvent);
     pause(false);
     wait();
+    CloseHandle(m_frameReadyEvent);
+    CloseHandle(m_stopThreadEvent);
 }
 
 void TNuiStream::pause(bool pause)

@@ -35,18 +35,21 @@ public:
     bool open();
     ImageType imageType() const { return m_imageType; }
     ImageResolution imageResolution() const { return m_imageResolution; }
-    const NUI_IMAGE_FRAME &frame() const { return m_frame; }
+    void readFrame(NUI_IMAGE_FRAME &frame);
     const uchar *data() const { return m_data; }
     uint dataSize() const { return m_dataSize; }
+    HANDLE handle() const { return m_streamHandle; }
 
 protected:
     bool processNewFrame();
 
     HANDLE m_streamHandle;
-    NUI_IMAGE_FRAME m_frame;
     uchar *m_data;
     uint m_dataSize;
     QMutex m_dataMutex;
+
+    NUI_IMAGE_FRAME m_frame;
+    QMutex m_frameMutex;
 
     ImageType m_imageType;
     ImageResolution m_imageResolution;
@@ -54,6 +57,8 @@ protected:
 
 class TNuiColorStream : public TNuiImageStream
 {
+    Q_OBJECT
+
 public:
     TNuiColorStream(TNuiSensor *parent)
         : TNuiImageStream(parent, ColorType)
@@ -65,6 +70,8 @@ public:
 
 class TNuiDepthStream : public TNuiImageStream
 {
+    Q_OBJECT
+
 public:
     TNuiDepthStream(TNuiSensor *parent)
         : TNuiImageStream(parent, DepthType)
