@@ -58,7 +58,10 @@ public:
 
     void setFlags(Flags flags) { m_flags = flags; }
     void setFlag(Flag flag, bool enabled);
-    bool hasFlag(Flag flag) { return (m_flags & flag) == flag; }
+    bool hasFlag(Flag flag) const { return (m_flags & flag) == flag; }
+
+    void setFrameBufferSize(ulong size);
+    ulong frameBufferSize() const { return m_frameBufferSize; }
 
 protected:
     bool processNewFrame();
@@ -76,6 +79,7 @@ protected:
     Type m_imageType;
     Resolution m_imageResolution;
     Flags m_flags;
+    ulong m_frameBufferSize;
 };
 
 class TNuiColorStream : public TNuiImageStream

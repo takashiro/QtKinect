@@ -8,6 +8,7 @@ TNuiImageStream::TNuiImageStream(TNuiSensor *parent, Type imageType)
     , m_dataSize(640 * 480 * 4)
     , m_imageResolution(Resolution_640x480)
     , m_flags(0)
+    , m_frameBufferSize(2)
 {
     m_data = new uchar[m_dataSize];
 }
@@ -26,7 +27,7 @@ bool TNuiImageStream::open()
                     (NUI_IMAGE_TYPE) m_imageType,
                     (NUI_IMAGE_RESOLUTION) m_imageResolution,
                     m_flags,
-                    2,
+                    m_frameBufferSize,
                     m_frameReadyEvent,
                     &m_streamHandle));
     if (m_isOpen)
@@ -48,6 +49,14 @@ void TNuiImageStream::setFlag(Flag flag, bool enabled)
     } else {
         m_flags &= ~flag;
     }
+}
+
+void TNuiImageStream::setFrameBufferSize(ulong size)
+{
+    if (size <= NUI_IMAGE_STREAM_FRAME_LIMIT_MAXIMUM)
+        m_frameBufferSize = size;
+    else
+        m_frameBufferSize = NUI_IMAGE_STREAM_FRAME_LIMIT_MAXIMUM;
 }
 
 bool TNuiImageStream::processNewFrame()
