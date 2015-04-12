@@ -9,6 +9,11 @@ TNuiSkeletonStreamPrivate::TNuiSkeletonStreamPrivate(TNuiSensor *sensor)
     m_frameReadyEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 }
 
+TNuiSkeletonStreamPrivate::~TNuiSkeletonStreamPrivate()
+{
+    stop();
+}
+
 bool TNuiSkeletonStreamPrivate::open()
 {
    if (isRunning())

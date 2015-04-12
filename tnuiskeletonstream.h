@@ -50,6 +50,7 @@ class TNuiSkeletonStreamPrivate: public TNuiStream
 
 protected:
    TNuiSkeletonStreamPrivate(TNuiSensor *sensor);
+   ~TNuiSkeletonStreamPrivate();
 
    bool open();
    bool processNewFrame();
