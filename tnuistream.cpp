@@ -8,6 +8,7 @@ TNuiStream::TNuiStream(TNuiSensor *parent)
     , m_paused(false)
     , m_isOpen(false)
 {
+    m_frameReadyEvent = INVALID_HANDLE_VALUE;
     m_stopThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 }
 
@@ -38,6 +39,11 @@ void TNuiStream::stop()
 
 void TNuiStream::run()
 {
+    if (m_frameReadyEvent == INVALID_HANDLE_VALUE) {
+        qDebug("frame-ready event is not set.");
+        return;
+    }
+
     HANDLE events[] = {m_frameReadyEvent, m_stopThreadEvent};
 
     forever {
