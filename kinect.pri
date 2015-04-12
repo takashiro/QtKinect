@@ -47,5 +47,4 @@ HEADERS += \
     $$PWD/tnuiskeletonstream.h \
     $$PWD/tnuistream.h \
     $$PWD/tnuitracker.h \
-    $$PWD/windowsutil.h \
-    $$PWD/stdafx.h
+    $$PWD/windowsutil.h

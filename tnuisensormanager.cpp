@@ -1,7 +1,6 @@
 #include "tnuisensormanager.h"
 #include "tnuisensor.h"
 #include "windowsutil.h"
-#include "stdafx.h"
 
 #include <QCoreApplication>
 
@@ -51,11 +50,11 @@ TNuiSensorManager::TNuiSensorManager(QObject *parent)
     for (int i = 0; i < iCount; ++i) {
         INuiSensor* pNuiSensor = nullptr;
 
-        if (SUCCEEDED(NuiCreateSensorByIndex(i, &pNuiSensor))) {
+        if (SUCCEEDED(NuiCreateSensorByIndex(i, &pNuiSensor)))
             _addSensor(pNuiSensor);
-        }
 
-        SafeRelease(pNuiSensor);
+        if (pNuiSensor != nullptr)
+            pNuiSensor->Release();
     }
 
     NuiSetDeviceStatusCallback(ChangeStatusCallback, this);
