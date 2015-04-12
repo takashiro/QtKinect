@@ -27,7 +27,6 @@ protected:
     void handleNewFrame();
 
     TNuiSkeletonStream *m_skeletonStream;
-    TNuiImageStream *m_colorStream;
     NUI_SKELETON_POSITION_INDEX m_target;
 };
 
