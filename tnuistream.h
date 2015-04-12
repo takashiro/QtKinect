@@ -27,6 +27,7 @@ public:
 
     // Pause the stream
     void pause(bool pause);
+    void stop();
 
 signals:
     void readyRead();
