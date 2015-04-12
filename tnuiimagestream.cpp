@@ -1,6 +1,8 @@
 #include "tnuiimagestream.h"
 #include "tnuisensor.h"
 
+QMap<HANDLE, HANDLE> TNuiImageStream::m_frameReadyEvents;
+
 TNuiImageStream::TNuiImageStream(TNuiSensor *parent, Type imageType)
     : TNuiStream(parent)
     , m_streamHandle(INVALID_HANDLE_VALUE)
@@ -15,14 +17,18 @@ TNuiImageStream::TNuiImageStream(TNuiSensor *parent, Type imageType)
 
 TNuiImageStream::~TNuiImageStream()
 {
+    stop();
+
     m_dataMutex.lock();
     delete[] m_outputData;
+    m_outputData = nullptr;
     m_dataMutex.unlock();
 }
 
 bool TNuiImageStream::open()
 {
     INuiSensor *sensor = m_sensor->nativeSensor();
+    m_frameReadyEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     m_isOpen = (S_OK == sensor->NuiImageStreamOpen(
                     (NUI_IMAGE_TYPE) m_type,
                     (NUI_IMAGE_RESOLUTION) m_resolution,
@@ -30,6 +36,16 @@ bool TNuiImageStream::open()
                     m_frameBufferSize,
                     m_frameReadyEvent,
                     &m_streamHandle));
+
+    //If the stream is already opened, the corresponding frame-ready event should be reused.
+    //@to-do: Check what will happen if Kinect is restarted
+    if (m_frameReadyEvents.contains(m_streamHandle)) {
+        CloseHandle(m_frameReadyEvent);
+        m_frameReadyEvent = m_frameReadyEvents.value(m_streamHandle);
+    } else {
+        m_frameReadyEvents[m_streamHandle] = m_frameReadyEvent;
+    }
+
     if (m_isOpen)
         start();
     return m_isOpen;
@@ -73,11 +89,6 @@ bool TNuiImageStream::processNewFrame()
     }
     m_frameMutex.unlock();
 
-    if (m_paused) {
-        // Stream paused. Skip frame process and release the frame.
-        goto ReleaseFrame;
-    }
-
     INuiFrameTexture *texture = readFrameTexture();
     if (texture == nullptr)
         return false;
@@ -97,7 +108,6 @@ bool TNuiImageStream::processNewFrame()
     // Unlock frame data
     texture->UnlockRect(0);
 
-ReleaseFrame:
     m_frameMutex.lock();
     sensor->NuiImageStreamReleaseFrame(m_streamHandle, &m_frame);
     m_frameMutex.unlock();
@@ -119,6 +129,8 @@ QImage TNuiColorStream::readImage()
     uchar *rgba = reinterpret_cast<uchar *>(&color);
 
     m_dataMutex.lock();
+    if (m_outputData == nullptr)
+        return image;
     for (int j = 0; j < 480; j++) {
         for (int i = 0; i < 640; i++) {
             rgba[0] = m_outputData[k++];

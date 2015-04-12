@@ -15,16 +15,37 @@ TNuiColorCamera::TNuiColorCamera(QQuickItem *parent)
     m_image.fill(Qt::black);
 
     TNuiSensor *sensor = SensorManager->sensor();
-    m_stream = new TNuiBackgroundRemovedColorStream(sensor);
-    connect(sensor, &TNuiSensor::stateChanged, this, &TNuiColorCamera::tryOpenStream);
-    tryOpenStream();
+    if (sensor != nullptr) {
+        m_stream = new TNuiColorStream(sensor);
+        connect(sensor, &TNuiSensor::stateChanged, this, &TNuiColorCamera::tryOpenStream);
+        tryOpenStream();
+    }
 }
 
 void TNuiColorCamera::tryOpenStream()
 {
     if (m_stream->open()) {
         disconnect(m_stream->sensor(), &TNuiSensor::stateChanged, this, &TNuiColorCamera::tryOpenStream);
-        connect(m_stream, &TNuiStream::readyRead, this, &TNuiColorCamera::updateFrame);
+        connect(m_stream, &TNuiColorStream::readyRead, this, &TNuiColorCamera::updateFrame);
+    }
+}
+
+bool TNuiColorCamera::backgroundRemoved() const
+{
+    return m_stream->inherits("TNuiBackgroundRemovedColorStream");
+}
+
+void TNuiColorCamera::setBackgroundRemoved(bool removed)
+{
+    TNuiSensor *sensor = SensorManager->sensor();
+    if (sensor == nullptr)
+        return;
+
+    if (removed != backgroundRemoved()) {
+        delete m_stream;
+        m_stream = removed ? new TNuiBackgroundRemovedColorStream(sensor) : new TNuiColorStream(sensor);
+        connect(m_stream, &TNuiColorStream::readyRead, this, &TNuiColorCamera::updateFrame);
+        m_stream->open();
     }
 }
 

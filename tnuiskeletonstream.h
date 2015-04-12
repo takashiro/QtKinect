@@ -23,6 +23,7 @@ public:
     typedef ulong TrackingFlags;
 
     TNuiSkeletonStream(TNuiSensor *sensor, TrackingFlags flags = EnableInNearRange | EnableSeatedSupport);
+    ~TNuiSkeletonStream();
 
     bool open();
     bool close();

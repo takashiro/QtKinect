@@ -11,8 +11,16 @@ class TNuiColorCamera : public QQuickItem
 {
     Q_OBJECT
 
+    Q_PROPERTY(bool backgroundRemoved READ backgroundRemoved WRITE setBackgroundRemoved NOTIFY backgroundRemovedChanged)
+
 public:
     TNuiColorCamera(QQuickItem *parent = 0);
+
+    bool backgroundRemoved() const;
+    void setBackgroundRemoved(bool removed);
+
+signals:
+    void backgroundRemovedChanged();
 
 protected:
     void tryOpenStream();

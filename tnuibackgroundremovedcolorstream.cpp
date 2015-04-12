@@ -9,11 +9,14 @@ class TNuiBackgroundRemovedColorStreamPrivate : public TNuiStream
         : TNuiStream(stream->sensor())
         , stream(stream)
     {
+        m_frameReadyEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
         NuiCreateBackgroundRemovedColorStream(m_sensor->nativeSensor(), &nativeStream);
     }
 
     ~TNuiBackgroundRemovedColorStreamPrivate()
     {
+        stop();
+
         nativeStream->Release();
     }
 
@@ -70,11 +73,15 @@ TNuiBackgroundRemovedColorStream::TNuiBackgroundRemovedColorStream(TNuiSensor *p
 
 TNuiBackgroundRemovedColorStream::~TNuiBackgroundRemovedColorStream()
 {
-    m_depthStream->deleteLater();
-    m_skeletonStream->deleteLater();
-    p_ptr->deleteLater();
+    stop();
 
+    delete m_depthStream;
+    delete m_skeletonStream;
+    delete p_ptr;
+
+    m_colorDataMutex.lock();
     delete[] m_colorData;
+    m_colorDataMutex.unlock();
 }
 
 bool TNuiBackgroundRemovedColorStream::open()
@@ -116,9 +123,9 @@ bool TNuiBackgroundRemovedColorStream::processNewFrame()
     if (isValid) {
         NUI_IMAGE_FRAME frame;
         readFrame(frame);
-        m_dataMutex.lock();
+        m_colorDataMutex.lock();
         p_ptr->nativeStream->ProcessColor(m_dataSize, m_colorData, frame.liTimeStamp);
-        m_dataMutex.unlock();
+        m_colorDataMutex.unlock();
     }
     return false;
 }

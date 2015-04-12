@@ -5,9 +5,12 @@
 
 #include <QMutex>
 #include <QImage>
+#include <QMap>
 
 class TNuiImageStream : public TNuiStream
 {
+    Q_OBJECT
+
 public:
     friend class TNuiSensor;
 
@@ -84,6 +87,7 @@ protected:
     Resolution m_resolution;
     Flags m_flags;
     ulong m_frameBufferSize;
+    static QMap<HANDLE, HANDLE> m_frameReadyEvents;
 };
 
 class TNuiColorStream : public TNuiImageStream

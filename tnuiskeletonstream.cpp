@@ -6,7 +6,7 @@
 TNuiSkeletonStreamPrivate::TNuiSkeletonStreamPrivate(TNuiSensor *sensor)
    : TNuiStream(sensor)
 {
-
+    m_frameReadyEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 }
 
 bool TNuiSkeletonStreamPrivate::open()
@@ -40,6 +40,15 @@ TNuiSkeletonStream::TNuiSkeletonStream(TNuiSensor *sensor, TrackingFlags flags)
     p_ptr->ref.ref();
     p_ptr->flags = flags;
     connect(p_ptr, &TNuiSkeletonStreamPrivate::readyRead, this, &TNuiSkeletonStream::readyRead);
+}
+
+TNuiSkeletonStream::~TNuiSkeletonStream()
+{
+    p_ptr->ref.deref();
+    if (p_ptr->ref.load() == 0) {
+        delete p_ptr;
+        p_ptr = nullptr;
+    }
 }
 
 bool TNuiSkeletonStream::open()

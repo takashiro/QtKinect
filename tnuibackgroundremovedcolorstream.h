@@ -36,6 +36,10 @@ protected:
     DWORD m_trackedSkeleton;
 
     uchar *m_colorData;
+    QMutex m_colorDataMutex;
+
+private:
+    Q_DISABLE_COPY(TNuiBackgroundRemovedColorStream)
 };
 
 #endif // TNUIBACKGROUNDREMOVEDCOLORSTREAM_H

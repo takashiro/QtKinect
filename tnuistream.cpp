@@ -8,14 +8,12 @@ TNuiStream::TNuiStream(TNuiSensor *parent)
     , m_paused(false)
     , m_isOpen(false)
 {
-    m_frameReadyEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     m_stopThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 }
 
 TNuiStream::~TNuiStream()
 {
     stop();
-    CloseHandle(m_frameReadyEvent);
     CloseHandle(m_stopThreadEvent);
 }
 
@@ -34,8 +32,8 @@ void TNuiStream::pause(bool pause)
 void TNuiStream::stop()
 {
     SetEvent(m_stopThreadEvent);
-    SetEvent(m_stopThreadEvent);
     pause(false);
+    wait();
 }
 
 void TNuiStream::run()
