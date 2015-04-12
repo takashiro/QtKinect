@@ -1,7 +1,7 @@
 #ifndef TNUIBACKGROUNDREMOVEDCOLORSTREAM_H
 #define TNUIBACKGROUNDREMOVEDCOLORSTREAM_H
 
-#include "tnuiimagestream.h"
+#include "tnuicolorstream.h"
 
 #include <KinectBackgroundRemoval.h>
 

@@ -16,34 +16,36 @@ contains(QMAKE_HOST.arch, x86_64){
 LIBS += -lKinect10
 
 INCLUDEPATH += $$PWD
-INCLUDEPATH += $$PWD/model
-INCLUDEPATH += $$PWD/view
 
 SOURCES += \
-    $$PWD/windowsutil.cpp \
-    $$PWD/tnuistream.cpp \
-    $$PWD/tnuisensor.cpp \
     $$PWD/view/tnuicolorcamera.cpp \
+    $$PWD/view/tnuimousearea.cpp \
+    $$PWD/view/tnuitrackeritem.cpp \
+    $$PWD/kinectglobal.cpp \
+    $$PWD/tnuibackgroundremovedcolorstream.cpp \
+    $$PWD/tnuicolorstream.cpp \
+    $$PWD/tnuidepthstream.cpp \
+    $$PWD/tnuiimagestream.cpp \
+    $$PWD/tnuisensor.cpp \
     $$PWD/tnuisensormanager.cpp \
     $$PWD/tnuiskeletonstream.cpp \
-    $$PWD/tnuiimagestream.cpp \
+    $$PWD/tnuistream.cpp \
     $$PWD/tnuitracker.cpp \
-    $$PWD/view/tnuimousearea.cpp \
-    $$PWD/kinectglobal.cpp \
-    $$PWD/view/tnuitrackeritem.cpp \
-    $$PWD/tnuibackgroundremovedcolorstream.cpp
+    $$PWD/windowsutil.cpp
 
 HEADERS += \
-    $$PWD/windowsutil.h \
-    $$PWD/stdafx.h \
-    $$PWD/tnuistream.h \
-    $$PWD/tnuisensor.h \
     $$PWD/view/tnuicolorcamera.h \
+    $$PWD/view/tnuimousearea.h \
+    $$PWD/view/tnuitrackeritem.h \
+    $$PWD/kinectglobal.h \
+    $$PWD/tnuibackgroundremovedcolorstream.h \
+    $$PWD/tnuicolorstream.h \
+    $$PWD/tnuidepthstream.h \
+    $$PWD/tnuiimagestream.h \
+    $$PWD/tnuisensor.h \
     $$PWD/tnuisensormanager.h \
     $$PWD/tnuiskeletonstream.h \
-    $$PWD/tnuiimagestream.h \
+    $$PWD/tnuistream.h \
     $$PWD/tnuitracker.h \
-    $$PWD/view/tnuimousearea.h \
-    $$PWD/kinectglobal.h \
-    $$PWD/view/tnuitrackeritem.h \
-    $$PWD/tnuibackgroundremovedcolorstream.h
+    $$PWD/windowsutil.h \
+    $$PWD/stdafx.h

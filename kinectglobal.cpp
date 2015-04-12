@@ -1,8 +1,9 @@
 #include "kinectglobal.h"
 
-#include "tnuicolorcamera.h"
-#include "tnuitrackeritem.h"
-#include "tnuimousearea.h"
+#include "view/tnuicolorcamera.h"
+#include "view/tnuitrackeritem.h"
+#include "view/tnuimousearea.h"
+
 #include "tnuisensormanager.h"
 
 void initializeKinect(){

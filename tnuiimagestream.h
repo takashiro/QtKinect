@@ -4,7 +4,6 @@
 #include "tnuistream.h"
 
 #include <QMutex>
-#include <QImage>
 #include <QMap>
 
 class TNuiImageStream : public TNuiStream
@@ -88,36 +87,6 @@ protected:
     Flags m_flags;
     ulong m_frameBufferSize;
     static QMap<HANDLE, HANDLE> m_frameReadyEvents;
-};
-
-class TNuiColorStream : public TNuiImageStream
-{
-    Q_OBJECT
-
-public:
-    TNuiColorStream(TNuiSensor *parent)
-        : TNuiImageStream(parent, Color)
-    {
-    }
-
-    QImage readImage();
-
-protected:
-    INuiFrameTexture *readFrameTexture();
-};
-
-class TNuiDepthStream : public TNuiImageStream
-{
-    Q_OBJECT
-
-public:
-    TNuiDepthStream(TNuiSensor *parent, bool enablePlayerIndex = false)
-        : TNuiImageStream(parent, enablePlayerIndex ? DepthAndPlayerIndex : Depth)
-    {
-    }
-
-protected:
-    INuiFrameTexture *readFrameTexture();
 };
 
 #endif // TNUIIMAGESTREAM_H

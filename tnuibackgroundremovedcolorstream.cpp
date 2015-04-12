@@ -1,5 +1,6 @@
 #include "tnuibackgroundremovedcolorstream.h"
 #include "tnuisensor.h"
+#include "tnuidepthstream.h"
 
 class TNuiBackgroundRemovedColorStreamPrivate : public TNuiStream
 {
