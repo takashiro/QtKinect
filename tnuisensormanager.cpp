@@ -62,8 +62,8 @@ TNuiSensorManager::TNuiSensorManager(QObject *parent)
 
 TNuiSensorManager *TNuiSensorManager::instance()
 {
-    static TNuiSensorManager manager;
-    return &manager;
+    static TNuiSensorManager *manager = new TNuiSensorManager(qApp);
+    return manager;
 }
 
 TNuiSensorManager::~TNuiSensorManager()
@@ -71,13 +71,12 @@ TNuiSensorManager::~TNuiSensorManager()
     foreach (TNuiSensor *sensor, m_sensors) {
         //@todo: it takes an extremely long time to shutdown()
         //sensor->shutdown();
-        delete sensor;
     }
 }
 
 TNuiSensor *TNuiSensorManager::_addSensor(INuiSensor *pNuiSensor)
 {
-    TNuiSensor *sensor = new TNuiSensor(pNuiSensor);
+    TNuiSensor *sensor = new TNuiSensor(pNuiSensor, this);
     m_sensors << sensor;
     emit newSensorConnected(sensor);
     return sensor;

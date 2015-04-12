@@ -49,7 +49,6 @@ public:
         UseSkeletonFlag = NUI_INITIALIZE_FLAG_USES_SKELETON
     };
 
-    TNuiSensor(INuiSensor *sensor, QObject *parent = 0);
     ~TNuiSensor();
 
     INuiSensor *nativeSensor() const { return m_sensor; }
@@ -100,6 +99,7 @@ signals:
     void disconnected();
 
 protected:
+    TNuiSensor(INuiSensor *sensor, QObject *parent = 0);
     void _updateState();
 
     State m_state;
