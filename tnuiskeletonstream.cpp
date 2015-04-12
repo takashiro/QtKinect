@@ -39,8 +39,11 @@ TNuiSkeletonStreamPrivate *TNuiSkeletonStream::p_ptr = nullptr;
 TNuiSkeletonStream::TNuiSkeletonStream(TNuiSensor *sensor, TrackingFlags flags)
     : QObject(sensor)
 {
-    if (p_ptr == nullptr)
+    if (p_ptr == nullptr) {
         p_ptr = new TNuiSkeletonStreamPrivate(sensor);
+        //Reference count applied. The object shouldn't be deleted otherwise.
+        p_ptr->setParent(nullptr);
+    }
 
     p_ptr->ref.ref();
     p_ptr->flags = flags;
