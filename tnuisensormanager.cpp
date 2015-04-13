@@ -15,7 +15,7 @@ void CALLBACK TNuiSensorManager::ChangeStatusCallback(HRESULT hrStatus, const OL
         foreach (TNuiSensor *sensor, manager->m_sensors) {
             if (sensor->deviceConnectionId() == instanceName) {
                 //Simply update the state
-                sensor->_updateState();
+                sensor->updateState();
                 isNewSensor = false;
                 break;
             }
@@ -34,7 +34,7 @@ void CALLBACK TNuiSensorManager::ChangeStatusCallback(HRESULT hrStatus, const OL
         foreach (TNuiSensor *sensor, manager->m_sensors) {
             if (sensor->deviceConnectionId() != instanceName)
                 continue;
-            sensor->_updateState();
+            sensor->updateState();
             break;
         }
     }

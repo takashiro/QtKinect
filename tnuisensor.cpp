@@ -17,14 +17,36 @@ TNuiSensor::~TNuiSensor()
     m_sensor->Release();
 }
 
+class TNuiSensorStarter: public QThread
+{
+    friend class TNuiSensor;
+
+    TNuiSensorStarter(TNuiSensor *sensor, uint flags)
+        : QThread(sensor)
+        , sensor(sensor)
+        , flags(flags)
+    {
+    }
+
+    void run()
+    {
+        HRESULT hr = sensor->nativeSensor()->NuiInitialize(flags);
+        if (hr == S_OK)
+            sensor->updateState();
+    }
+
+    TNuiSensor *sensor;
+    uint flags;
+};
+
 void TNuiSensor::initialize(uint flags)
 {
-     HRESULT hr = m_sensor->NuiInitialize(flags);
-     if (hr == S_OK)
-         _updateState();
+    TNuiSensorStarter *starter = new TNuiSensorStarter(this, flags);
+    connect(starter, &TNuiSensorStarter::finished, starter, &TNuiSensorStarter::deleteLater);
+    starter->start();
 }
 
-void TNuiSensor::_updateState()
+void TNuiSensor::updateState()
 {
     m_state = (State) m_sensor->NuiStatus();
     emit stateChanged();

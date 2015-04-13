@@ -56,6 +56,9 @@ public:
     //Initializes the Kinect.
     void initialize(uint flags);
 
+    //Refresh the state of Kinect sensor
+    void updateState();
+
     //Turns the sensor off. No action is taken if the sensor is already off.
     void shutdown() {m_sensor->NuiShutdown();}
 
@@ -100,7 +103,6 @@ signals:
 
 protected:
     TNuiSensor(INuiSensor *sensor, QObject *parent = 0);
-    void _updateState();
 
     State m_state;
 
