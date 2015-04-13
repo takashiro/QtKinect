@@ -1,17 +1,17 @@
-#ifndef TNUIMOUSEAREA_H
-#define TNUIMOUSEAREA_H
+#ifndef TNUIHANDAREA_H
+#define TNUIHANDAREA_H
 
 #include <QQuickItem>
 
 class QTimer;
 
-class TNuiMouseArea : public QQuickItem
+class TNuiHandArea : public QQuickItem
 {
     Q_OBJECT
 
 public:
-    TNuiMouseArea(QQuickItem *parent = 0);
-    ~TNuiMouseArea();
+    TNuiHandArea(QQuickItem *parent = 0);
+    ~TNuiHandArea();
 
 protected slots:
     void onLeftHandMoved(const QPointF &pos);
@@ -33,4 +33,4 @@ private:
     QTimer *m_longTouchTimer;
 };
 
-#endif // TNUIMOUSEAREA_H
+#endif // TNUIHANDAREA_H
