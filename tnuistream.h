@@ -25,9 +25,6 @@ public:
     virtual bool open() = 0;
     bool isOpen() const {return m_isOpen;}
     void tryOpen();
-
-    // Pause the stream
-    void pause(bool pause);
     void stop();
 
 signals:
@@ -35,6 +32,7 @@ signals:
 
 protected:
     virtual bool processNewFrame() = 0;
+    void run();
 
     HANDLE m_frameReadyEvent;
     TNuiSensor *m_sensor;
@@ -42,9 +40,6 @@ protected:
     bool m_isOpen;
 
 private:
-    void run();
-
-    QMutex m_mutex;
     HANDLE m_stopThreadEvent;
 };
 

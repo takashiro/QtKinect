@@ -28,22 +28,9 @@ void TNuiStream::tryOpen()
     }
 }
 
-void TNuiStream::pause(bool pause)
-{
-    if (m_paused == pause)
-        return;
-
-    m_paused = pause;
-    if (pause)
-        m_mutex.lock();
-    else
-        m_mutex.unlock();
-}
-
 void TNuiStream::stop()
 {
     SetEvent(m_stopThreadEvent);
-    pause(false);
     wait();
 }
 
@@ -57,8 +44,6 @@ void TNuiStream::run()
     HANDLE events[] = {m_frameReadyEvent, m_stopThreadEvent};
 
     forever {
-        m_mutex.lock();
-        m_mutex.unlock();
         DWORD ret = WaitForMultipleObjects(ARRAYSIZE(events), events, FALSE, INFINITE);
         ret -= WAIT_OBJECT_0;
         if (ret == 0) {//m_frameReadyEvent
