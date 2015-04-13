@@ -2,9 +2,10 @@
 
 #include "tnuisensormanager.h"
 #include "tnuisensor.h"
-#include "tnuiimagestream.h"
 #include "tnuiskeletonstream.h"
 #include "tnuitracker.h"
+
+#include <QTimer>
 
 TNuiMouseArea::TNuiMouseArea(QQuickItem *parent)
     : QQuickItem(parent)
@@ -17,6 +18,13 @@ TNuiMouseArea::TNuiMouseArea(QQuickItem *parent)
     static TNuiTracker *rightTracker = new TNuiTracker(sensor, NUI_SKELETON_POSITION_HAND_RIGHT);
     connect(leftTracker, &TNuiTracker::moved, this, &TNuiMouseArea::onLeftHandMoved);
     connect(rightTracker, &TNuiTracker::moved, this, &TNuiMouseArea::onRightHandMoved);
+
+    m_longTouchTimer = new QTimer(this);
+    m_longTouchTimer->setSingleShot(true);
+    m_longTouchTimer->setInterval(1500);
+    connect(m_longTouchTimer, &QTimer::timeout, this, &TNuiMouseArea::checkLongTouch);
+    connect(this, &TNuiMouseArea::entered, m_longTouchTimer, (void (QTimer::*)()) &QTimer::start);
+    connect(this, &TNuiMouseArea::exited, m_longTouchTimer, &QTimer::stop);
 }
 
 TNuiMouseArea::~TNuiMouseArea()
@@ -38,16 +46,8 @@ void TNuiMouseArea::onHandMoved(bool &isUnderHand, const QPointF &pos)
     QRectF rect = mapRectToScene(boundingRect());
 
     if (rect.contains(pos)) {
-        if (isUnderHand) {
-            //@to-do: use grip event instead
-            QDateTime now = QDateTime::currentDateTime();
-            if (m_focusTimeOffset.secsTo(now) >= 1) {
-                m_focusTimeOffset = now;
-                emit touched();
-            }
-        } else {
+        if (!isUnderHand) {
             isUnderHand = true;
-            m_focusTimeOffset = QDateTime::currentDateTime();
             emit entered();
         }
     } else {
@@ -56,4 +56,10 @@ void TNuiMouseArea::onHandMoved(bool &isUnderHand, const QPointF &pos)
             emit exited();
         }
     }
+}
+
+void TNuiMouseArea::checkLongTouch()
+{
+    if (m_isUnderLeftHand || m_isUnderRightHand)
+        emit longTouched();
 }

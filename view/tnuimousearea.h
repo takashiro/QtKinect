@@ -2,11 +2,8 @@
 #define TNUIMOUSEAREA_H
 
 #include <QQuickItem>
-#include <QDateTime>
 
-class TNuiSkeletonStream;
-class TNuiColorStream;
-class TNuiTracker;
+class QTimer;
 
 class TNuiMouseArea : public QQuickItem
 {
@@ -21,15 +18,19 @@ protected slots:
     void onRightHandMoved(const QPointF &pos);
     void onHandMoved(bool &isUnderHand, const QPointF &pos);
 
+    void checkLongTouch();
+
 signals:
-    void entered();
-    void exited();
-    void touched();
+    void entered();//Either hand enters
+    void exited(); //Either hand leaves
+
+    void longTouched();//Either hand touches for over 1.5 seconds
 
 private:
     bool m_isUnderLeftHand;
     bool m_isUnderRightHand;
-    QDateTime m_focusTimeOffset;
+
+    QTimer *m_longTouchTimer;
 };
 
 #endif // TNUIMOUSEAREA_H
