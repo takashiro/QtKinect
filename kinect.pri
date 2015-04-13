@@ -1,19 +1,25 @@
 
+KINECT_LIB = KinectBackgroundRemoval KinectInteraction
+
 INCLUDEPATH += "$$(KINECTSDK10_DIR)inc"
 INCLUDEPATH += "$$(KINECT_TOOLKIT_DIR)inc"
 
+KINECT_VERSION = 180
+KINECT_ARCHTECTURE = x86
+KINECT_WORDSIZE = 32
 contains(QMAKE_HOST.arch, x86_64){
-    LIBS += -L"$$(KINECTSDK10_DIR)lib/amd64"
-    LIBS += -L"$$(KINECT_TOOLKIT_DIR)Lib/amd64"
-
-    LIBS += -lKinectBackgroundRemoval180_64
-}else{
-    LIBS += -L"$$(KINECTSDK10_DIR)lib/x86"
-    LIBS += -L"$$(KINECT_TOOLKIT_DIR)Lib/x86"
-
-    LIBS += -lKinectBackgroundRemoval180_32
+    KINECT_ARCHTECTURE = amd64
+    KINECT_WORDSIZE = 64
 }
+
+LIBS += -L"$$(KINECTSDK10_DIR)lib/$${KINECT_ARCHTECTURE}"
+LIBS += -L"$$(KINECT_TOOLKIT_DIR)Lib/$${KINECT_ARCHTECTURE}"
 LIBS += -lKinect10
+
+for(libname, KINECT_LIB): LIBS += -l$${libname}$${KINECT_VERSION}_$${KINECT_WORDSIZE}
+!build_pass: for(libname, KINECT_LIB) {
+    system("$$QMAKE_COPY \"$$system_path($$(KINECT_TOOLKIT_DIR)bin/$${libname}$${KINECT_VERSION}_$${KINECT_WORDSIZE}.dll)\" \"$$WORKING_DIR\"")
+}
 
 INCLUDEPATH += $$PWD
 
@@ -23,6 +29,7 @@ SOURCES += \
     $$PWD/view/tnuitrackeritem.cpp \
     $$PWD/kinectglobal.cpp \
     $$PWD/tnuibackgroundremovedcolorstream.cpp \
+    $$PWD/tnuibackgroundremovedcolorstream_p.cpp \
     $$PWD/tnuicolorstream.cpp \
     $$PWD/tnuidepthstream.cpp \
     $$PWD/tnuiimagestream.cpp \
@@ -39,6 +46,7 @@ HEADERS += \
     $$PWD/view/tnuitrackeritem.h \
     $$PWD/kinectglobal.h \
     $$PWD/tnuibackgroundremovedcolorstream.h \
+    $$PWD/tnuibackgroundremovedcolorstream_p.h \
     $$PWD/tnuicolorstream.h \
     $$PWD/tnuidepthstream.h \
     $$PWD/tnuiimagestream.h \
