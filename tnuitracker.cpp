@@ -7,13 +7,12 @@ QPointF MapToScreen(const Vector4 &point)
 {
     //@to-do: It's not fixed
     const NUI_IMAGE_RESOLUTION resolution = NUI_IMAGE_RESOLUTION_640x480;
-    long x;
-    long y;
+    long x, y;
     ushort depth;
 
     NuiTransformSkeletonToDepthImage(point, &x, &y, &depth, resolution); // Returns coordinates in depth space
 
-    LONG backupX = x, backupY = y;
+    long backupX = x, backupY = y;
     if (FAILED(NuiImageGetColorPixelCoordinatesFromDepthPixelAtResolution(resolution, resolution, NULL, x, y, depth, &x, &y))) {
         x = backupX;
         y = backupY;
