@@ -9,12 +9,23 @@ TNuiStream::TNuiStream(TNuiSensor *parent)
 {
     m_frameReadyEvent = INVALID_HANDLE_VALUE;
     m_stopThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+    connect(m_sensor, &TNuiSensor::connected, this, &TNuiStream::tryOpen);
 }
 
 TNuiStream::~TNuiStream()
 {
     stop();
     CloseHandle(m_stopThreadEvent);
+}
+
+void TNuiStream::tryOpen()
+{
+    if (open()) {
+        TNuiSensor *sensor = qobject_cast<TNuiSensor *>(sender());
+        if (sensor)
+            disconnect(sensor, &TNuiSensor::connected, this, &TNuiStream::tryOpen);
+    }
 }
 
 void TNuiStream::pause(bool pause)

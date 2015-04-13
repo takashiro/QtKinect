@@ -26,6 +26,7 @@ public:
     ~TNuiSkeletonStream();
 
     bool open();
+    void tryOpen();
     bool close();
     bool reopen();
 

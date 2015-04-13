@@ -64,6 +64,11 @@ bool TNuiSkeletonStream::open()
     return p_ptr->open();
 }
 
+void TNuiSkeletonStream::tryOpen()
+{
+    p_ptr->tryOpen();
+}
+
 bool TNuiSkeletonStream::close()
 {
     return S_OK == p_ptr->m_sensor->nativeSensor()->NuiSkeletonTrackingDisable();

@@ -23,7 +23,6 @@ signals:
     void backgroundRemovedChanged();
 
 protected:
-    void tryOpenStream();
     void updateFrame();
     QSGNode *updatePaintNode(QSGNode *node, UpdatePaintNodeData *);
 

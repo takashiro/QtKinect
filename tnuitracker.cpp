@@ -27,7 +27,7 @@ TNuiTracker::TNuiTracker(TNuiSensor *sensor, NUI_SKELETON_POSITION_INDEX target)
     , m_target(target)
 {
     connect(m_skeletonStream, &TNuiSkeletonStream::readyRead, this, &TNuiTracker::handleNewFrame);
-    m_skeletonStream->open();
+    m_skeletonStream->tryOpen();
 }
 
 void TNuiTracker::handleNewFrame()

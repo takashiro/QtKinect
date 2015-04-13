@@ -24,6 +24,7 @@ public:
 
     virtual bool open() = 0;
     bool isOpen() const {return m_isOpen;}
+    void tryOpen();
 
     // Pause the stream
     void pause(bool pause);
