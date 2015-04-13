@@ -3,8 +3,6 @@
 
 #include "tnuicolorstream.h"
 
-#include <KinectBackgroundRemoval.h>
-
 class TNuiDepthStream;
 class TNuiSkeletonStream;
 

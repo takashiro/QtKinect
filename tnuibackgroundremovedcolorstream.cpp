@@ -1,67 +1,17 @@
 #include "tnuibackgroundremovedcolorstream.h"
 #include "tnuisensor.h"
 #include "tnuidepthstream.h"
+#include "tnuibackgroundremovedcolorstream_p.h"
 
-class TNuiBackgroundRemovedColorStreamPrivate : public TNuiStream
-{
-    friend class TNuiBackgroundRemovedColorStream;
-
-    TNuiBackgroundRemovedColorStreamPrivate(TNuiBackgroundRemovedColorStream *stream)
-        : TNuiStream(stream->sensor())
-        , stream(stream)
-    {
-        m_frameReadyEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-        NuiCreateBackgroundRemovedColorStream(m_sensor->nativeSensor(), &nativeStream);
-    }
-
-    ~TNuiBackgroundRemovedColorStreamPrivate()
-    {
-        stop();
-
-        nativeStream->Release();
-    }
-
-    bool open()
-    {
-        NUI_IMAGE_RESOLUTION colorResolution = (NUI_IMAGE_RESOLUTION) stream->resolution();
-        NUI_IMAGE_RESOLUTION depthResolution = (NUI_IMAGE_RESOLUTION) stream->m_depthStream->resolution();
-        m_isOpen = (S_OK == nativeStream->Enable(colorResolution, depthResolution, m_frameReadyEvent));
-        if (m_isOpen)
-            start();
-        return m_isOpen;
-    }
-
-    bool processNewFrame()
-    {
-        HRESULT hr;
-        NUI_BACKGROUND_REMOVED_COLOR_FRAME frame;
-
-        hr = nativeStream->GetNextFrame(0, &frame);
-        if (FAILED(hr))
-            return false;
-
-        stream->m_dataMutex.lock();
-        memcpy_s(stream->m_outputData, stream->m_dataSize, frame.pBackgroundRemovedColorData, frame.backgroundRemovedColorDataLength);
-        stream->m_dataMutex.unlock();
-
-        hr = nativeStream->ReleaseFrame(&frame);
-        if (FAILED(hr))
-            return false;
-
-        return true;
-    }
-
-    TNuiBackgroundRemovedColorStream *stream;
-    INuiBackgroundRemovedColorStream *nativeStream;
-};
+#include <KinectBackgroundRemoval.h>
 
 TNuiBackgroundRemovedColorStream::TNuiBackgroundRemovedColorStream(TNuiSensor *parent)
     : TNuiColorStream(parent)
-    , m_trackedSkeleton(NUI_SKELETON_INVALID_TRACKING_ID)
-    , p_ptr(new TNuiBackgroundRemovedColorStreamPrivate(this))
 {
+    m_trackedSkeleton = NUI_SKELETON_INVALID_TRACKING_ID;
     m_inputData = m_colorData = new uchar[m_dataSize];
 
+    p_ptr = new TNuiBackgroundRemovedColorStreamPrivate(this);
     connect(p_ptr, &TNuiBackgroundRemovedColorStreamPrivate::readyRead, this, &TNuiBackgroundRemovedColorStream::readyRead);
 
     m_depthStream = new TNuiDepthStream(parent, true);
