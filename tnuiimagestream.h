@@ -11,8 +11,6 @@ class TNuiImageStream : public TNuiStream
     Q_OBJECT
 
 public:
-    friend class TNuiSensor;
-
     enum Type{
         DepthAndPlayerIndex = NUI_IMAGE_TYPE_DEPTH_AND_PLAYER_INDEX,
         Color = NUI_IMAGE_TYPE_COLOR,

@@ -15,8 +15,6 @@ class TNuiStream : public QThread
     Q_OBJECT
 
 public:
-    friend class TNuiSensor;
-
     TNuiStream(TNuiSensor *parent);
     virtual ~TNuiStream();
 

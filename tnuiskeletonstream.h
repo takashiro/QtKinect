@@ -12,8 +12,6 @@ class TNuiSkeletonStream : public QObject
     Q_OBJECT
 
 public:
-    friend class TNuiSensor;
-
     enum TrackingFlag{
         SupressNoFrameData = NUI_SKELETON_TRACKING_FLAG_SUPPRESS_NO_FRAME_DATA,
         TitleSetsTrackedSkeletions = NUI_SKELETON_TRACKING_FLAG_TITLE_SETS_TRACKED_SKELETONS,
