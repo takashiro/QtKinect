@@ -54,7 +54,7 @@ public:
     INuiSensor *nativeSensor() const { return m_sensor; }
 
     //Initializes the Kinect.
-    void initialize(uint flags) {m_sensor->NuiInitialize(flags);}
+    void initialize(uint flags);
 
     //Turns the sensor off. No action is taken if the sensor is already off.
     void shutdown() {m_sensor->NuiShutdown();}
@@ -105,8 +105,6 @@ protected:
     State m_state;
 
 private:
-    void _onStateChanged();
-
     INuiSensor *m_sensor;
     QString m_deviceConnectionId;
 };
