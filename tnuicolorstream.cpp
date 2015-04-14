@@ -7,7 +7,7 @@ QImage TNuiColorStream::readImage()
     uint color;
     uchar *rgba = reinterpret_cast<uchar *>(&color);
 
-    m_dataMutex.lock();
+    m_dataMutex.lockForRead();
     if (m_outputData == nullptr)
         return image;
     for (int j = 0; j < 480; j++) {

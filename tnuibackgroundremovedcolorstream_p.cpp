@@ -39,7 +39,7 @@ bool TNuiBackgroundRemovedColorStreamPrivate::processNewFrame()
     if (FAILED(hr))
         return false;
 
-    stream->m_dataMutex.lock();
+    stream->m_dataMutex.lockForWrite();
     memcpy_s(stream->m_outputData, stream->m_dataSize, frame.pBackgroundRemovedColorData, frame.backgroundRemovedColorDataLength);
     stream->m_dataMutex.unlock();
 

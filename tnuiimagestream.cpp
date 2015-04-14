@@ -19,7 +19,7 @@ TNuiImageStream::~TNuiImageStream()
 {
     stop();
 
-    m_dataMutex.lock();
+    m_dataMutex.lockForWrite();
     delete[] m_outputData;
     m_outputData = nullptr;
     m_dataMutex.unlock();
@@ -53,7 +53,7 @@ bool TNuiImageStream::open()
 
 void TNuiImageStream::readFrame(NUI_IMAGE_FRAME &frame)
 {
-    m_frameMutex.lock();
+    m_frameMutex.lockForRead();
     frame = m_frame;
     m_frameMutex.unlock();
 }
@@ -82,7 +82,7 @@ bool TNuiImageStream::processNewFrame()
     INuiSensor *sensor = m_sensor->nativeSensor();
 
     // Attempt to get the color frame
-    m_frameMutex.lock();
+    m_frameMutex.lockForWrite();
     if (S_OK != sensor->NuiImageStreamGetNextFrame(m_streamHandle, 0, &m_frame)) {
         m_frameMutex.unlock();
         return false;
@@ -99,7 +99,7 @@ bool TNuiImageStream::processNewFrame()
 
     // Make sure we've received valid data
     if (lockedRect.Pitch != 0) {
-        m_dataMutex.lock();
+        m_dataMutex.lockForWrite();
         memcpy_s(m_inputData, m_dataSize, lockedRect.pBits, lockedRect.size);
         m_dataMutex.unlock();
         isValid = true;
@@ -108,12 +108,12 @@ bool TNuiImageStream::processNewFrame()
     // Unlock frame data
     texture->UnlockRect(0);
 
-    m_frameMutex.lock();
+    m_frameMutex.lockForWrite();
     sensor->NuiImageStreamReleaseFrame(m_streamHandle, &m_frame);
     m_frameMutex.unlock();
 
     int maxi = 640 * 480 * 4;
-    m_dataMutex.lock();
+    m_dataMutex.lockForWrite();
     for (int i = 3; i < maxi; i += 4)
         m_inputData[i] = 255;
     m_dataMutex.unlock();

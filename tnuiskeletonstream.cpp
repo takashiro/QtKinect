@@ -28,7 +28,7 @@ bool TNuiSkeletonStreamPrivate::open()
 bool TNuiSkeletonStreamPrivate::processNewFrame()
 {
    // Attempt to get the color frame
-   frameMutex.lock();
+   frameMutex.lockForWrite();
    bool isValid = (S_OK == m_sensor->nativeSensor()->NuiSkeletonGetNextFrame(0, &frame));
    frameMutex.unlock();
    return isValid;
@@ -96,7 +96,7 @@ TNuiSkeletonStream::TrackingFlags TNuiSkeletonStream::flags() const
 
 void TNuiSkeletonStream::readFrame(NUI_SKELETON_FRAME &frame)
 {
-    p_ptr->frameMutex.lock();
+    p_ptr->frameMutex.lockForRead();
     frame = p_ptr->frame;
     p_ptr->frameMutex.unlock();
 }

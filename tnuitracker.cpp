@@ -3,6 +3,8 @@
 #include "tnuiimagestream.h"
 #include "tnuisensor.h"
 
+#include <QPointF>
+
 QPointF MapToScreen(const Vector4 &point)
 {
     //@to-do: It's not fixed

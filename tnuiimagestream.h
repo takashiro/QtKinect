@@ -3,7 +3,7 @@
 
 #include "tnuistream.h"
 
-#include <QMutex>
+#include <QReadWriteLock>
 #include <QMap>
 
 class TNuiImageStream : public TNuiStream
@@ -54,7 +54,7 @@ public:
     void readFrame(NUI_IMAGE_FRAME &frame);
     HANDLE handle() const { return m_streamHandle; }
 
-    void lockData() { m_dataMutex.lock(); }
+    void lockData() { m_dataMutex.lockForRead(); }
     const uchar *data() const { return m_outputData; }
     void unlockData() { m_dataMutex.unlock(); }
     uint dataSize() const { return m_dataSize; }
@@ -75,10 +75,10 @@ protected:
     uchar *m_inputData;
     uchar *m_outputData;
     uint m_dataSize;
-    QMutex m_dataMutex;
+    QReadWriteLock m_dataMutex;
 
     NUI_IMAGE_FRAME m_frame;
-    QMutex m_frameMutex;
+    QReadWriteLock m_frameMutex;
 
     Type m_type;
     Resolution m_resolution;

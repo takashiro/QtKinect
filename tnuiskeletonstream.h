@@ -3,6 +3,8 @@
 
 #include "tnuistream.h"
 
+#include <QReadWriteLock>
+
 class TNuiSensor;
 
 class TNuiSkeletonStreamPrivate;
@@ -56,7 +58,7 @@ protected:
 
    TNuiSkeletonStream::TrackingFlags flags;
    NUI_SKELETON_FRAME frame;
-   QMutex frameMutex;
+   QReadWriteLock frameMutex;
    QAtomicInt ref;
 };
 

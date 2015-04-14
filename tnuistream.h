@@ -2,8 +2,6 @@
 #define TNUISTREAM_H
 
 #include <QThread>
-#include <QMutex>
-#include <QVector>
 
 #include <Windows.h>
 #include <NuiApi.h>
