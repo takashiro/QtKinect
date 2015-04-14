@@ -1,6 +1,8 @@
 #ifndef TNUIBACKGROUNDREMOVEDCOLORSTREAMPRIVATE_H
 #define TNUIBACKGROUNDREMOVEDCOLORSTREAMPRIVATE_H
 
+#ifdef KINECT_USE_BACKGROUNDREMOVAL
+
 #include "tnuistream.h"
 
 struct INuiBackgroundRemovedColorStream;
@@ -21,5 +23,7 @@ class TNuiBackgroundRemovedColorStreamPrivate : public TNuiStream
     TNuiBackgroundRemovedColorStream *stream;
     INuiBackgroundRemovedColorStream *nativeStream;
 };
+
+#endif
 
 #endif // TNUIBACKGROUNDREMOVEDCOLORSTREAMPRIVATE_H

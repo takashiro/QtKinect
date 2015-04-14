@@ -1,6 +1,4 @@
 
-KINECT_LIB = KinectBackgroundRemoval KinectInteraction
-
 INCLUDEPATH += "$$(KINECTSDK10_DIR)inc"
 INCLUDEPATH += "$$(KINECT_TOOLKIT_DIR)inc"
 
@@ -28,8 +26,6 @@ SOURCES += \
     $$PWD/view/tnuihandarea.cpp \
     $$PWD/view/tnuitrackeritem.cpp \
     $$PWD/kinectglobal.cpp \
-    $$PWD/tnuibackgroundremovedcolorstream.cpp \
-    $$PWD/tnuibackgroundremovedcolorstream_p.cpp \
     $$PWD/tnuicolorstream.cpp \
     $$PWD/tnuidepthstream.cpp \
     $$PWD/tnuiimagestream.cpp \
@@ -45,8 +41,6 @@ HEADERS += \
     $$PWD/view/tnuihandarea.h \
     $$PWD/view/tnuitrackeritem.h \
     $$PWD/kinectglobal.h \
-    $$PWD/tnuibackgroundremovedcolorstream.h \
-    $$PWD/tnuibackgroundremovedcolorstream_p.h \
     $$PWD/tnuicolorstream.h \
     $$PWD/tnuidepthstream.h \
     $$PWD/tnuiimagestream.h \
@@ -56,3 +50,19 @@ HEADERS += \
     $$PWD/tnuistream.h \
     $$PWD/tnuitracker.h \
     $$PWD/windowsutil.h
+
+contains(KINECT_LIB, KinectBackgroundRemoval){
+    DEFINES += KINECT_USE_BACKGROUNDREMOVAL
+
+    SOURCES += \
+        $$PWD/tnuibackgroundremovedcolorstream.cpp \
+        $$PWD/tnuibackgroundremovedcolorstream_p.cpp
+
+    HEADERS += \
+        $$PWD/tnuibackgroundremovedcolorstream.h \
+        $$PWD/tnuibackgroundremovedcolorstream_p.h
+}
+
+contains(KINECT_LIB, KinectInteraction){
+    DEFINES += KINECT_USE_INTERACTION
+}

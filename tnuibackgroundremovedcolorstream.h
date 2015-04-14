@@ -1,6 +1,8 @@
 #ifndef TNUIBACKGROUNDREMOVEDCOLORSTREAM_H
 #define TNUIBACKGROUNDREMOVEDCOLORSTREAM_H
 
+#ifdef KINECT_USE_BACKGROUNDREMOVAL
+
 #include "tnuicolorstream.h"
 
 class TNuiDepthStream;
@@ -39,5 +41,7 @@ protected:
 private:
     Q_DISABLE_COPY(TNuiBackgroundRemovedColorStream)
 };
+
+#endif
 
 #endif // TNUIBACKGROUNDREMOVEDCOLORSTREAM_H

@@ -1,7 +1,10 @@
 #include "tnuicolorcamera.h"
 #include "tnuisensor.h"
 #include "tnuisensormanager.h"
+#include "tnuicolorstream.h"
+#ifdef KINECT_USE_BACKGROUNDREMOVAL
 #include "tnuibackgroundremovedcolorstream.h"
+#endif
 
 #include <QQuickWindow>
 #include <QSGSimpleTextureNode>
@@ -32,6 +35,7 @@ bool TNuiColorCamera::backgroundRemoved() const
 
 void TNuiColorCamera::setBackgroundRemoved(bool removed)
 {
+#ifdef KINECT_USE_BACKGROUNDREMOVAL
     TNuiSensor *sensor = SensorManager->sensor();
     if (sensor == nullptr)
         return;
@@ -42,6 +46,9 @@ void TNuiColorCamera::setBackgroundRemoved(bool removed)
         connect(m_stream, &TNuiColorStream::readyRead, this, &TNuiColorCamera::updateFrame);
         m_stream->tryOpen();
     }
+#else
+    Q_UNUSED(removed);
+#endif
 }
 
 void TNuiColorCamera::updateFrame()
