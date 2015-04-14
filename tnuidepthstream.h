@@ -13,8 +13,13 @@ public:
     {
     }
 
+    bool inNearMode() const { return m_inNearMode; }
+
 protected:
     INuiFrameTexture *readFrameTexture();
+
+private:
+    bool m_inNearMode;
 };
 
 #endif // TNUIDEPTHSTREAM_H
