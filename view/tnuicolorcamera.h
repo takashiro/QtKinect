@@ -15,6 +15,7 @@ class TNuiColorCamera : public QQuickItem
 
 public:
     TNuiColorCamera(QQuickItem *parent = 0);
+    ~TNuiColorCamera();
 
     bool backgroundRemoved() const;
     void setBackgroundRemoved(bool removed);

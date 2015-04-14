@@ -8,11 +8,9 @@
 
 TNuiColorCamera::TNuiColorCamera(QQuickItem *parent)
     : QQuickItem(parent)
-    , m_image(640, 480, QImage::Format_RGB32)
     , m_texture(nullptr)
 {
     setFlag(ItemHasContents, true);
-    m_image.fill(Qt::black);
 
     TNuiSensor *sensor = SensorManager->sensor();
     if (sensor != nullptr) {
@@ -20,6 +18,11 @@ TNuiColorCamera::TNuiColorCamera(QQuickItem *parent)
         connect(m_stream, &TNuiColorStream::readyRead, this, &TNuiColorCamera::updateFrame);
         m_stream->tryOpen();
     }
+}
+
+TNuiColorCamera::~TNuiColorCamera()
+{
+    delete m_texture;
 }
 
 bool TNuiColorCamera::backgroundRemoved() const
