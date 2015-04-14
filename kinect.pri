@@ -65,4 +65,6 @@ contains(KINECT_LIB, KinectBackgroundRemoval){
 
 contains(KINECT_LIB, KinectInteraction){
     DEFINES += KINECT_USE_INTERACTION
+    SOURCES += $$PWD/tnuiinteractionstream.cpp
+    HEADERS += $$PWD/tnuiinteractionstream.h
 }
