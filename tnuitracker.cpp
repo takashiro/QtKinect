@@ -42,7 +42,7 @@ void TNuiTracker::handleNewFrame()
 
     //@todo: Track more players
     for (int i = 0; i < NUI_SKELETON_COUNT; i++) {
-        if (frame.SkeletonData[i].dwTrackingID != 0){
+        if (frame.SkeletonData[i].dwTrackingID != 0) {
             QPointF pos = MapToScreen(frame.SkeletonData[i].SkeletonPositions[m_target]);
             emit moved(pos);
             break;
