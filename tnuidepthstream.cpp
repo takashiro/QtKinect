@@ -1,7 +1,12 @@
 #include "tnuidepthstream.h"
 #include "tnuisensor.h"
 
-INuiFrameTexture *TNuiDepthStream::readFrameTexture()
+TNuiDepthStreamInternal::TNuiDepthStreamInternal(TNuiSensor *sensor, QObject *parent)
+    : TNuiImageStreamInternal(sensor, parent)
+{
+}
+
+INuiFrameTexture *TNuiDepthStreamInternal::readFrameTexture()
 {
     INuiFrameTexture *texture;
     BOOL inNearMode;
@@ -14,4 +19,15 @@ INuiFrameTexture *TNuiDepthStream::readFrameTexture()
     m_inNearMode = (inNearMode == TRUE);
 
     return texture;
+}
+
+QPointer<TNuiDepthStreamInternal> TNuiDepthStream::d = nullptr;
+
+TNuiDepthStream::TNuiDepthStream(TNuiSensor *sensor, bool enablePlayerIndex)
+    : TNuiImageStream(sensor)
+{
+    if (d == nullptr)
+        d = new TNuiDepthStreamInternal(sensor);
+    TNuiImageStream::setInternal(d);
+    d->m_type = enablePlayerIndex ? DepthAndPlayerIndex : Depth;
 }

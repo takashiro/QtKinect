@@ -1,40 +1,40 @@
 #include "tnuistream.h"
 #include "tnuisensor.h"
 
-TNuiStream::TNuiStream(TNuiSensor *parent)
+TNuiStreamInternal::TNuiStreamInternal(TNuiSensor *sensor, QObject *parent)
     : QThread(parent)
-    , m_sensor(parent)
+    , m_sensor(sensor)
     , m_paused(false)
     , m_isOpen(false)
 {
     m_frameReadyEvent = INVALID_HANDLE_VALUE;
     m_stopThreadEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-    connect(m_sensor, &TNuiSensor::connected, this, &TNuiStream::tryOpen);
+    connect(m_sensor, &TNuiSensor::connected, this, &TNuiStreamInternal::tryOpen);
 }
 
-TNuiStream::~TNuiStream()
+TNuiStreamInternal::~TNuiStreamInternal()
 {
     stop();
     CloseHandle(m_stopThreadEvent);
 }
 
-void TNuiStream::tryOpen()
+void TNuiStreamInternal::tryOpen()
 {
     if (open()) {
         TNuiSensor *sensor = qobject_cast<TNuiSensor *>(sender());
         if (sensor)
-            disconnect(sensor, &TNuiSensor::connected, this, &TNuiStream::tryOpen);
+            disconnect(sensor, &TNuiSensor::connected, this, &TNuiStreamInternal::tryOpen);
     }
 }
 
-void TNuiStream::stop()
+void TNuiStreamInternal::stop()
 {
     SetEvent(m_stopThreadEvent);
     wait();
 }
 
-void TNuiStream::run()
+void TNuiStreamInternal::run()
 {
     if (m_frameReadyEvent == INVALID_HANDLE_VALUE) {
         qDebug("frame-ready event is not set.");
@@ -56,4 +56,30 @@ void TNuiStream::run()
             break;
         }
     }
+}
+
+TNuiStream::TNuiStream(TNuiSensor *sensor)
+    : QObject(sensor)
+{
+}
+
+void TNuiStream::setInternal(TNuiStreamInternal *internal)
+{
+    d = internal;
+    d->ref.ref();
+    connect(d, &TNuiStreamInternal::readyRead, this, &TNuiStream::readyRead);
+}
+
+TNuiStream::~TNuiStream()
+{
+    d->ref.deref();
+    if (d->ref.load() == 1) {
+        delete d;
+        d = nullptr;
+    }
+}
+
+void TNuiStream::tryOpen()
+{
+    d->tryOpen();
 }

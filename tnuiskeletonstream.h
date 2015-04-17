@@ -4,12 +4,13 @@
 #include "tnuistream.h"
 
 #include <QReadWriteLock>
+#include <QPointer>
 
 class TNuiSensor;
 
-class TNuiSkeletonStreamPrivate;
+class TNuiSkeletonStreamInternal;
 
-class TNuiSkeletonStream : public QObject
+class TNuiSkeletonStream : public TNuiStream
 {
     Q_OBJECT
 
@@ -25,11 +26,6 @@ public:
     TNuiSkeletonStream(TNuiSensor *sensor, TrackingFlags flags = EnableInNearRange | EnableSeatedSupport);
     ~TNuiSkeletonStream();
 
-    bool open();
-    void tryOpen();
-    bool close();
-    bool reopen();
-
     void setFlags(TrackingFlags flags);
     void resetFlags(TrackingFlags flags);
     TrackingFlags flags() const;
@@ -40,20 +36,21 @@ signals:
     void readyRead();
 
 protected:
-    static TNuiSkeletonStreamPrivate *p_ptr;
+    static QPointer<TNuiSkeletonStreamInternal> d;
 };
 
-class TNuiSkeletonStreamPrivate: public TNuiStream
+class TNuiSkeletonStreamInternal: public TNuiStreamInternal
 {
    Q_OBJECT
 
    friend class TNuiSkeletonStream;
 
 protected:
-   TNuiSkeletonStreamPrivate(TNuiSensor *sensor);
-   ~TNuiSkeletonStreamPrivate();
+   TNuiSkeletonStreamInternal(TNuiSensor *sensor);
+   ~TNuiSkeletonStreamInternal();
 
    bool open();
+   bool close();
    bool processNewFrame();
 
    TNuiSkeletonStream::TrackingFlags flags;

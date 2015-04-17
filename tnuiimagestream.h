@@ -6,6 +6,8 @@
 #include <QReadWriteLock>
 #include <QMap>
 
+class TNuiImageStreamInternal;
+
 class TNuiImageStream : public TNuiStream
 {
     Q_OBJECT
@@ -42,33 +44,49 @@ public:
     };
     typedef uint Flags;
 
-    TNuiImageStream(TNuiSensor *parent, Type type);
+    TNuiImageStream(TNuiSensor *sensor);
     ~TNuiImageStream();
 
-    bool open();
-    Type type() const { return m_type; }
+    Type type() const;
 
-    void setResolution(Resolution resolution) { m_resolution = resolution; }
-    Resolution resolution() const { return m_resolution; }
-
+    void setResolution(Resolution resolution);
+    Resolution resolution() const;
     void readFrame(NUI_IMAGE_FRAME &frame);
-    HANDLE handle() const { return m_streamHandle; }
+    HANDLE handle() const;
+    void lockData();
+    const uchar *data() const;
+    void unlockData();
+    uint dataSize() const;
 
-    void lockData() { m_dataMutex.lockForRead(); }
-    const uchar *data() const { return m_outputData; }
-    void unlockData() { m_dataMutex.unlock(); }
-    uint dataSize() const { return m_dataSize; }
-
-    void setFlags(Flags flags) { m_flags = flags; }
+    void setFlags(Flags flags);
     void setFlag(Flag flag, bool enabled);
-    bool hasFlag(Flag flag) const { return (m_flags & flag) == flag; }
+    bool hasFlag(Flag flag) const;
 
     void setFrameBufferSize(ulong size);
-    ulong frameBufferSize() const { return m_frameBufferSize; }
+    ulong frameBufferSize() const;
+
+protected:
+    void setInternal(TNuiImageStreamInternal *internal);
+
+private:
+    TNuiImageStreamInternal *d;
+};
+
+class TNuiImageStreamInternal : public TNuiStreamInternal
+{
+    Q_OBJECT
+
+    friend class TNuiImageStream;
+
+public:
+    TNuiImageStreamInternal(TNuiSensor *sensor, QObject *parent = 0);
+    ~TNuiImageStreamInternal();
+
+    bool open();
+    bool close();
 
 protected:
     bool processNewFrame();
-
     virtual INuiFrameTexture *readFrameTexture() = 0;
 
     HANDLE m_streamHandle;
@@ -80,11 +98,10 @@ protected:
     NUI_IMAGE_FRAME m_frame;
     QReadWriteLock m_frameMutex;
 
-    Type m_type;
-    Resolution m_resolution;
-    Flags m_flags;
+    TNuiImageStream::Type m_type;
+    TNuiImageStream::Resolution m_resolution;
+    TNuiImageStream::Flags m_flags;
     ulong m_frameBufferSize;
-    static QMap<HANDLE, HANDLE> m_frameReadyEvents;
 };
 
 #endif // TNUIIMAGESTREAM_H

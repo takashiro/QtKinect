@@ -8,27 +8,28 @@
 
 class TNuiSensor;
 
-class TNuiStream : public QThread
+class TNuiStreamInternal : public QThread
 {
     Q_OBJECT
 
-public:
-    TNuiStream(TNuiSensor *parent);
-    virtual ~TNuiStream();
+    friend class TNuiStream;
 
-    TNuiSensor *sensor() const {return m_sensor;}
+public:
+    TNuiStreamInternal(TNuiSensor *sensor, QObject *parent = 0);
+    ~TNuiStreamInternal();
 
     virtual bool open() = 0;
-    bool isOpen() const {return m_isOpen;}
+    virtual bool close() = 0;
     void tryOpen();
+
     void stop();
 
 signals:
     void readyRead();
 
 protected:
-    virtual bool processNewFrame() = 0;
     void run();
+    virtual bool processNewFrame() = 0;
 
     HANDLE m_frameReadyEvent;
     TNuiSensor *m_sensor;
@@ -37,6 +38,33 @@ protected:
 
 private:
     HANDLE m_stopThreadEvent;
+    QAtomicInt ref;
+};
+
+class TNuiStream : public QObject
+{
+    Q_OBJECT
+
+public:
+    TNuiStream(TNuiSensor *sensor);
+    ~TNuiStream();
+
+    TNuiSensor *sensor() const { return d->m_sensor; }
+
+    bool open() { return d->open(); }
+    bool close() { return d->close(); }
+    bool isOpen() const { return d->m_isOpen; }
+    void tryOpen();
+
+signals:
+    void readyRead();
+
+protected:
+    //The derived class is responsible to call this in it's constructor
+    void setInternal(TNuiStreamInternal *internal);
+
+private:
+    TNuiStreamInternal *d;
 };
 
 #endif // TNUISTREAM_H

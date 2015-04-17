@@ -1,21 +1,18 @@
 #include "tnuiimagestream.h"
 #include "tnuisensor.h"
 
-QMap<HANDLE, HANDLE> TNuiImageStream::m_frameReadyEvents;
-
-TNuiImageStream::TNuiImageStream(TNuiSensor *parent, Type imageType)
-    : TNuiStream(parent)
+TNuiImageStreamInternal::TNuiImageStreamInternal(TNuiSensor *sensor, QObject *parent)
+    : TNuiStreamInternal(sensor, parent)
     , m_streamHandle(INVALID_HANDLE_VALUE)
-    , m_type(imageType)
     , m_dataSize(640 * 480 * 4)
-    , m_resolution(Resolution_640x480)
+    , m_resolution(TNuiImageStream::Resolution_640x480)
     , m_flags(0)
     , m_frameBufferSize(2)
 {
     m_inputData = m_outputData = new uchar[m_dataSize];
 }
 
-TNuiImageStream::~TNuiImageStream()
+TNuiImageStreamInternal::~TNuiImageStreamInternal()
 {
     stop();
 
@@ -25,8 +22,11 @@ TNuiImageStream::~TNuiImageStream()
     m_dataMutex.unlock();
 }
 
-bool TNuiImageStream::open()
+bool TNuiImageStreamInternal::open()
 {
+    if (m_isOpen)
+        return true;
+
     INuiSensor *sensor = m_sensor->nativeSensor();
     m_frameReadyEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     m_isOpen = (S_OK == sensor->NuiImageStreamOpen(
@@ -37,45 +37,20 @@ bool TNuiImageStream::open()
                     m_frameReadyEvent,
                     &m_streamHandle));
 
-    //If the stream is already opened, the corresponding frame-ready event should be reused.
-    //@to-do: Check what will happen if Kinect is restarted
-    if (m_frameReadyEvents.contains(m_streamHandle)) {
-        CloseHandle(m_frameReadyEvent);
-        m_frameReadyEvent = m_frameReadyEvents.value(m_streamHandle);
-    } else {
-        m_frameReadyEvents[m_streamHandle] = m_frameReadyEvent;
-    }
-
     if (m_isOpen)
         start();
+
     return m_isOpen;
 }
 
-void TNuiImageStream::readFrame(NUI_IMAGE_FRAME &frame)
+
+//@todo: Image stream can't be closed?
+bool TNuiImageStreamInternal::close()
 {
-    m_frameMutex.lockForRead();
-    frame = m_frame;
-    m_frameMutex.unlock();
+    return false;
 }
 
-void TNuiImageStream::setFlag(Flag flag, bool enabled)
-{
-    if (enabled) {
-        m_flags |= flag;
-    } else {
-        m_flags &= ~flag;
-    }
-}
-
-void TNuiImageStream::setFrameBufferSize(ulong size)
-{
-    if (size <= NUI_IMAGE_STREAM_FRAME_LIMIT_MAXIMUM)
-        m_frameBufferSize = size;
-    else
-        m_frameBufferSize = NUI_IMAGE_STREAM_FRAME_LIMIT_MAXIMUM;
-}
-
-bool TNuiImageStream::processNewFrame()
+bool TNuiImageStreamInternal::processNewFrame()
 {
     bool isValid = false;
 
@@ -119,4 +94,98 @@ bool TNuiImageStream::processNewFrame()
     m_dataMutex.unlock();
 
     return isValid;
+}
+
+TNuiImageStream::TNuiImageStream(TNuiSensor *sensor)
+    : TNuiStream(sensor)
+{
+}
+
+TNuiImageStream::~TNuiImageStream()
+{
+}
+
+void TNuiImageStream::setInternal(TNuiImageStreamInternal *internal)
+{
+    d = internal;
+    TNuiStream::setInternal(internal);
+}
+
+TNuiImageStream::Type TNuiImageStream::type() const
+{
+    return d->m_type;
+}
+
+void TNuiImageStream::setResolution(Resolution resolution)
+{
+    d->m_resolution = resolution;
+}
+
+TNuiImageStream::Resolution TNuiImageStream::resolution() const
+{
+    return d->m_resolution;
+}
+
+void TNuiImageStream::readFrame(NUI_IMAGE_FRAME &frame)
+{
+    d->m_frameMutex.lockForRead();
+    frame = d->m_frame;
+    d->m_frameMutex.unlock();
+}
+
+HANDLE TNuiImageStream::handle() const
+{
+    return d->m_streamHandle;
+}
+
+void TNuiImageStream::lockData()
+{
+    d->m_dataMutex.lockForRead();
+}
+
+const uchar *TNuiImageStream::data() const
+{
+    return d->m_outputData;
+}
+
+void TNuiImageStream::unlockData()
+{
+    d->m_dataMutex.unlock();
+}
+
+uint TNuiImageStream::dataSize() const
+{
+    return d->m_dataSize;
+}
+
+void TNuiImageStream::setFlags(Flags flags)
+{
+    d->m_flags = flags;
+}
+
+void TNuiImageStream::setFlag(Flag flag, bool enabled)
+{
+    if (enabled) {
+        d->m_flags |= flag;
+    } else {
+        d->m_flags &= ~flag;
+    }
+}
+
+bool TNuiImageStream::hasFlag(Flag flag) const
+{
+    return (d->m_flags & flag) == flag;
+}
+
+void TNuiImageStream::setFrameBufferSize(ulong size)
+{
+    if (size <= NUI_IMAGE_STREAM_FRAME_LIMIT_MAXIMUM)
+        d->m_frameBufferSize = size;
+    else
+        d->m_frameBufferSize = NUI_IMAGE_STREAM_FRAME_LIMIT_MAXIMUM;
+}
+
+ulong TNuiImageStream::frameBufferSize() const
+{
+    return d->m_frameBufferSize;
 }
