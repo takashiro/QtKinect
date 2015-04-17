@@ -40,8 +40,8 @@ class TNuiFullscreenClient : public INuiInteractionClient
     QAtomicInt ref;
 };
 
-TNuiInteractionStream::TNuiInteractionStream(TNuiSensor *sensor)
-    : TNuiStream(sensor)
+TNuiInteractionStreamInternal::TNuiInteractionStreamInternal(TNuiSensor *sensor, QObject *parent)
+    : TNuiStreamInternal(sensor, parent)
     , m_interactionClient(new TNuiFullscreenClient)
 {
     m_interactionClient->AddRef();
@@ -49,13 +49,13 @@ TNuiInteractionStream::TNuiInteractionStream(TNuiSensor *sensor)
         qFatal("Failed to create interaction stream");
 
     m_depthStream = new TNuiDepthStream(sensor, true);
-    connect(m_depthStream, &TNuiDepthStream::readyRead, this, &TNuiInteractionStream::processDepth);
+    connect(m_depthStream, &TNuiDepthStream::readyRead, this, &TNuiInteractionStreamInternal::processDepth);
 
     m_skeletonStream = new TNuiSkeletonStream(sensor);
-    connect(m_skeletonStream, &TNuiSkeletonStream::readyRead, this, &TNuiInteractionStream::processSkeleton);
+    connect(m_skeletonStream, &TNuiSkeletonStream::readyRead, this, &TNuiInteractionStreamInternal::processSkeleton);
 }
 
-TNuiInteractionStream::~TNuiInteractionStream()
+TNuiInteractionStreamInternal::~TNuiInteractionStreamInternal()
 {
     m_interactionClient->Release();
     m_stream->Release();
@@ -64,7 +64,7 @@ TNuiInteractionStream::~TNuiInteractionStream()
         CloseHandle(m_frameReadyEvent);
 }
 
-bool TNuiInteractionStream::open()
+bool TNuiInteractionStreamInternal::open()
 {
     if (m_depthStream->open() && m_skeletonStream->open()) {
         m_frameReadyEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -78,7 +78,7 @@ bool TNuiInteractionStream::open()
     return m_isOpen;
 }
 
-bool TNuiInteractionStream::close()
+bool TNuiInteractionStreamInternal::close()
 {
     //@todo: close depth stream & skeleton stream here
     if (S_OK == m_stream->Disable()) {
@@ -88,14 +88,8 @@ bool TNuiInteractionStream::close()
     return false;
 }
 
-void TNuiInteractionStream::readFrame(NUI_INTERACTION_FRAME &frame)
-{
-    m_frameMutex.lockForRead();
-    frame = m_frame;
-    m_frameMutex.unlock();
-}
 
-bool TNuiInteractionStream::processNewFrame()
+bool TNuiInteractionStreamInternal::processNewFrame()
 {
     m_frameMutex.lockForWrite();
     bool result = (S_OK == m_stream->GetNextFrame(0, &m_frame));
@@ -103,7 +97,7 @@ bool TNuiInteractionStream::processNewFrame()
     return result;
 }
 
-void TNuiInteractionStream::processDepth()
+void TNuiInteractionStreamInternal::processDepth()
 {
     NUI_IMAGE_FRAME frame;
     m_depthStream->readFrame(frame);
@@ -112,11 +106,33 @@ void TNuiInteractionStream::processDepth()
     m_depthStream->unlockData();
 }
 
-void TNuiInteractionStream::processSkeleton()
+void TNuiInteractionStreamInternal::processSkeleton()
 {
     NUI_SKELETON_FRAME frame;
     m_skeletonStream->readFrame(frame);
     Vector4 reading = {0};
     m_sensor->nativeSensor()->NuiAccelerometerGetCurrentReading(&reading);
     m_stream->ProcessSkeleton(NUI_SKELETON_COUNT, frame.SkeletonData, &reading, frame.liTimeStamp);
+}
+
+
+QPointer<TNuiInteractionStreamInternal> TNuiInteractionStream::d = nullptr;
+
+TNuiInteractionStream::TNuiInteractionStream(TNuiSensor *sensor)
+    : TNuiStream(sensor)
+{
+    if (d == nullptr)
+        d = new TNuiInteractionStreamInternal(sensor);
+    setInternal(d);
+}
+
+TNuiInteractionStream::~TNuiInteractionStream()
+{
+}
+
+void TNuiInteractionStream::readFrame(NUI_INTERACTION_FRAME &frame)
+{
+    d->m_frameMutex.lockForRead();
+    frame = d->m_frame;
+    d->m_frameMutex.unlock();
 }
