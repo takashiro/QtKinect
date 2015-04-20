@@ -5,6 +5,7 @@
 
 #include <QPointer>
 #include <QImage>
+#include <QSet>
 
 class TNuiColorStreamInternal : public TNuiImageStreamInternal
 {
@@ -22,17 +23,26 @@ protected:
     INuiFrameTexture *readFrameTexture();
 };
 
+class TNuiColorStreamEffect;
+
 class TNuiColorStream : public TNuiImageStream
 {
     Q_OBJECT
 
 public:
     TNuiColorStream(TNuiSensor *parent);
+    ~TNuiColorStream();
 
+    void addEffect(TNuiColorStreamEffect *effect);
+    void removeEffect(TNuiColorStreamEffect *effect);
+    bool hasEffect(TNuiColorStreamEffect *effect);
     QImage readImage();
 
 protected:
-    TNuiStreamInternal *createReader(TNuiSensor *sensor);
+    QSet<TNuiColorStreamEffect *> m_effects;
+    QMutex m_effectMutex;
+    uchar *m_image;
+    uint m_imageSize;
     static QPointer<TNuiColorStreamInternal> d;
 };
 

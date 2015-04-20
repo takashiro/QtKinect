@@ -26,6 +26,7 @@ SOURCES += \
     $$PWD/view/tnuihandarea.cpp \
     $$PWD/view/tnuitrackeritem.cpp \
     $$PWD/kinectglobal.cpp \
+    $$PWD/tnuicolorstreameffect.cpp \
     $$PWD/tnuicolorstream.cpp \
     $$PWD/tnuidepthstream.cpp \
     $$PWD/tnuiimagestream.cpp \
@@ -41,6 +42,7 @@ HEADERS += \
     $$PWD/view/tnuihandarea.h \
     $$PWD/view/tnuitrackeritem.h \
     $$PWD/kinectglobal.h \
+    $$PWD/tnuicolorstreameffect.h \
     $$PWD/tnuicolorstream.h \
     $$PWD/tnuidepthstream.h \
     $$PWD/tnuiimagestream.h \
@@ -53,14 +55,8 @@ HEADERS += \
 
 contains(KINECT_LIB, KinectBackgroundRemoval){
     DEFINES += KINECT_USE_BACKGROUNDREMOVAL
-
-    SOURCES += \
-        $$PWD/tnuibackgroundremovedcolorstream.cpp \
-        $$PWD/tnuibackgroundremovedcolorstream_p.cpp
-
-    HEADERS += \
-        $$PWD/tnuibackgroundremovedcolorstream.h \
-        $$PWD/tnuibackgroundremovedcolorstream_p.h
+    SOURCES += $$PWD/tnuibackgroundremovaleffect.cpp
+    HEADERS += $$PWD/tnuibackgroundremovaleffect.h
 }
 
 contains(KINECT_LIB, KinectInteraction){

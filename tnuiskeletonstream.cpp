@@ -19,10 +19,10 @@ bool TNuiSkeletonStreamInternal::open()
    if (isRunning())
        return true;
 
-   bool open = (S_OK == m_sensor->nativeSensor()->NuiSkeletonTrackingEnable(m_frameReadyEvent, flags));
-   if (open)
+   m_isOpen = S_OK == m_sensor->nativeSensor()->NuiSkeletonTrackingEnable(m_frameReadyEvent, flags);
+   if (m_isOpen)
        start();
-   return open;
+   return m_isOpen;
 }
 
 bool TNuiSkeletonStreamInternal::close()

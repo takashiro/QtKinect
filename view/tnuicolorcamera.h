@@ -6,6 +6,7 @@
 
 class TNuiColorStream;
 class QSGTexture;
+class TNuiBackgroundRemovalEffect;
 
 class TNuiColorCamera : public QQuickItem
 {
@@ -30,6 +31,7 @@ protected:
     TNuiColorStream *m_stream;
     QImage m_image;
     QSGTexture *m_texture;
+    TNuiBackgroundRemovalEffect *m_backgroundRemovalEffect;
 };
 
 #endif // TNUICOLORCAMERA_H

@@ -3,7 +3,7 @@
 #include "tnuisensormanager.h"
 #include "tnuicolorstream.h"
 #ifdef KINECT_USE_BACKGROUNDREMOVAL
-#include "tnuibackgroundremovedcolorstream.h"
+#include "tnuibackgroundremovaleffect.h"
 #endif
 
 #include <QQuickWindow>
@@ -12,6 +12,7 @@
 TNuiColorCamera::TNuiColorCamera(QQuickItem *parent)
     : QQuickItem(parent)
     , m_texture(nullptr)
+    , m_backgroundRemovalEffect(nullptr)
 {
     setFlag(ItemHasContents, true);
 
@@ -30,21 +31,21 @@ TNuiColorCamera::~TNuiColorCamera()
 
 bool TNuiColorCamera::backgroundRemoved() const
 {
-    return m_stream->inherits("TNuiBackgroundRemovedColorStream");
+    return m_backgroundRemovalEffect != nullptr && m_stream->hasEffect(m_backgroundRemovalEffect);
 }
 
 void TNuiColorCamera::setBackgroundRemoved(bool removed)
 {
 #ifdef KINECT_USE_BACKGROUNDREMOVAL
-    TNuiSensor *sensor = SensorManager->sensor();
-    if (sensor == nullptr)
-        return;
-
     if (removed != backgroundRemoved()) {
-        delete m_stream;
-        m_stream = removed ? new TNuiBackgroundRemovedColorStream(sensor) : new TNuiColorStream(sensor);
-        connect(m_stream, &TNuiColorStream::readyRead, this, &TNuiColorCamera::updateFrame);
-        m_stream->tryOpen();
+        if (removed) {
+            m_backgroundRemovalEffect = new TNuiBackgroundRemovalEffect(m_stream);
+            m_stream->addEffect(m_backgroundRemovalEffect);
+        } else {
+            m_stream->removeEffect(m_backgroundRemovalEffect);
+            delete m_backgroundRemovalEffect;
+            m_backgroundRemovalEffect = nullptr;
+        }
     }
 #else
     Q_UNUSED(removed);
