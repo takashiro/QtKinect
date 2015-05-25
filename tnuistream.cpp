@@ -73,8 +73,8 @@ void TNuiStream::setInternal(TNuiStreamInternal *internal)
 TNuiStream::~TNuiStream()
 {
     d->ref.deref();
-    if (d->ref.load() == 1) {
-        delete d;
+    if (d->ref.load() == 0) {
+        d->deleteLater();
         d = nullptr;
     }
 }
