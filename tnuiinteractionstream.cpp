@@ -5,8 +5,6 @@
 
 class TNuiFullscreenClient : public INuiInteractionClient
 {
-    friend class TNuiInteractionStream;
-
     STDMETHODIMP_(ULONG) AddRef()
     {
         ref.ref();
@@ -27,17 +25,27 @@ class TNuiFullscreenClient : public INuiInteractionClient
         return S_OK;
     }
 
-    STDMETHODIMP GetInteractionInfoAtLocation(DWORD /*skeletonTrackingId*/, NUI_HAND_TYPE /*handType*/, FLOAT /*x*/, FLOAT /*y*/, NUI_INTERACTION_INFO *interactionInfo)
+    STDMETHODIMP GetInteractionInfoAtLocation(DWORD skeletonTrackingId, NUI_HAND_TYPE handType, FLOAT x, FLOAT y, NUI_INTERACTION_INFO *interactionInfo)
     {
-        if (interactionInfo) {
-            interactionInfo->IsGripTarget = true;
-            return S_OK;
-        } else {
+        if (skeletonTrackingId <= 0 || handType == NUI_HAND_TYPE_NONE)
+            return E_FAIL;
+
+        if (interactionInfo == NULL)
             return E_POINTER;
-        }
+
+        Q_UNUSED(x);
+        Q_UNUSED(y);
+
+        interactionInfo->IsGripTarget = FALSE;
+        interactionInfo->IsPressTarget = TRUE;
+        interactionInfo->PressAttractionPointX = 0.0f;
+        interactionInfo->PressAttractionPointY = 0.0f;
+        interactionInfo->PressTargetControlId = 1;
+
+        return S_OK;
     }
 
-    QAtomicInt ref;
+   QAtomicInt ref;
 };
 
 TNuiInteractionStreamInternal::TNuiInteractionStreamInternal(TNuiSensor *sensor, QObject *parent)
@@ -74,7 +82,6 @@ bool TNuiInteractionStreamInternal::open()
     } else {
         m_isOpen = false;
     }
-    qDebug(m_isOpen ? "interaction open" : "interaction not open");
     return m_isOpen;
 }
 
@@ -102,8 +109,10 @@ void TNuiInteractionStreamInternal::processDepth()
     NUI_IMAGE_FRAME frame;
     m_depthStream->readFrame(frame);
     m_depthStream->lockData();
-    m_stream->ProcessDepth(m_depthStream->dataSize(), m_depthStream->data(), frame.liTimeStamp);
+    HRESULT hr = m_stream->ProcessDepth(m_depthStream->dataSize(), m_depthStream->data(), frame.liTimeStamp);
     m_depthStream->unlockData();
+    if (FAILED(hr))
+        qDebug("TNuiIntreactionStream: Failed to process skeleton.");
 }
 
 void TNuiInteractionStreamInternal::processSkeleton()
@@ -112,7 +121,9 @@ void TNuiInteractionStreamInternal::processSkeleton()
     m_skeletonStream->readFrame(frame);
     Vector4 reading = {0};
     m_sensor->nativeSensor()->NuiAccelerometerGetCurrentReading(&reading);
-    m_stream->ProcessSkeleton(NUI_SKELETON_COUNT, frame.SkeletonData, &reading, frame.liTimeStamp);
+    HRESULT hr = m_stream->ProcessSkeleton(NUI_SKELETON_COUNT, frame.SkeletonData, &reading, frame.liTimeStamp);
+    if (FAILED(hr))
+        qDebug("TNuiIntreactionStream: Failed to process skeleton.");
 }
 
 
