@@ -35,8 +35,6 @@ public:
     };
 
     enum InitializeFlag{
-        //This flag was deprecated in version 1.5; it is no longer used.
-        DefaultHardWareThreadFlag = NUI_INITIALIZE_DEFAULT_HARDWARE_THREAD,
         //Initialize the sensor to provide audio data.
         UseAudioInitFlag = NUI_INITIALIZE_FLAG_USES_AUDIO,
         //Initialize the sensor to provide color data.
