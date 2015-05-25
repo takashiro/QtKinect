@@ -85,8 +85,8 @@ TNuiBackgroundRemovalEffect::~TNuiBackgroundRemovalEffect()
     m_thread->wait();
     m_stream->Release();
 
-    delete m_depthStream;
-    delete m_skeletonStream;
+    m_depthStream->deleteLater();
+    m_skeletonStream->deleteLater();
 
     m_dataMutex.lockForWrite();
     delete[] m_data;
