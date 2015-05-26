@@ -65,33 +65,35 @@ void TNuiHandArea::onHandMoved(bool &isUnderHand, const QPointF &pos)
         if (!isUnderHand) {
             isUnderHand = true;
             if (m_isUnderLeftHand) {
-                m_enterZ =  m_leftTracker->z();
-                connect(m_leftTracker, &TNuiTracker::zChanged, this, &TNuiHandArea::onHandZChanged);
+                m_initialHandZ =  m_leftTracker->z();
+                connect(m_leftTracker, &TNuiTracker::zChanged, this, &TNuiHandArea::onTrackerZChanged);
             } else {
-                m_enterZ =  m_rightTracker->z();
-                connect(m_rightTracker, &TNuiTracker::zChanged, this, &TNuiHandArea::onHandZChanged);
+                m_initialHandZ =  m_rightTracker->z();
+                connect(m_rightTracker, &TNuiTracker::zChanged, this, &TNuiHandArea::onTrackerZChanged);
             }
             emit entered();
         }
     } else {
         if (isUnderHand) {
-            disconnect(m_leftTracker, &TNuiTracker::zChanged, this, &TNuiHandArea::onHandZChanged);
-            disconnect(m_rightTracker, &TNuiTracker::zChanged, this, &TNuiHandArea::onHandZChanged);
+            disconnect(m_leftTracker, &TNuiTracker::zChanged, this, &TNuiHandArea::onTrackerZChanged);
+            disconnect(m_rightTracker, &TNuiTracker::zChanged, this, &TNuiHandArea::onTrackerZChanged);
             isUnderHand = false;
             emit exited();
         }
     }
 }
 
-void TNuiHandArea::onHandZChanged(float z)
+void TNuiHandArea::onTrackerZChanged(float z)
 {
+    m_handZ = z;
+    emit handZChanged();
     if (m_isPressed) {
-        if (m_enterZ - z < m_pressUpRange) {
+        if (m_initialHandZ - z < m_pressUpRange) {
             m_isPressed = false;
             emit pressUp();
         }
     } else {
-        if (m_enterZ - z > m_pressDownRange) {
+        if (m_initialHandZ - z > m_pressDownRange) {
             m_isPressed = true;
             emit pressDown();
         }

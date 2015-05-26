@@ -15,6 +15,8 @@ class TNuiHandArea : public QQuickItem
     Q_PROPERTY(bool isPressed READ isPressed)
     Q_PROPERTY(float pressDownRange READ pressDownRange WRITE setPressDownRange)
     Q_PROPERTY(float pressUpRange READ pressUpRange WRITE setPressUpRange)
+    Q_PROPERTY(float handZ READ handZ NOTIFY handZChanged)
+    Q_PROPERTY(float initialHandZ READ initialHandZ)
 
 public:
     TNuiHandArea(QQuickItem *parent = 0);
@@ -30,13 +32,16 @@ public:
     float pressUpRange() const { return m_pressUpRange; }
     void setPressUpRange(float range) { m_pressUpRange = range;}
 
+    float handZ() const { return m_handZ; }
+    float initialHandZ() const { return m_initialHandZ; }
+
 protected:
     void resetState();
 
     void onLeftHandMoved(const QPointF &pos);
     void onRightHandMoved(const QPointF &pos);
     void onHandMoved(bool &isUnderHand, const QPointF &pos);
-    void onHandZChanged(float z);
+    void onTrackerZChanged(float z);
 
 signals:
     void entered();
@@ -50,6 +55,8 @@ signals:
     void gripped();
     void ungripped();
 
+    void handZChanged();
+
 private:
     bool m_isUnderLeftHand;
     bool m_isUnderRightHand;
@@ -58,7 +65,8 @@ private:
     QTimer *m_longTouchTimer;
     QTimer *m_longPressTimer;
 
-    float m_enterZ;
+    float m_initialHandZ;
+    float m_handZ;
     float m_pressDownRange;
     float m_pressUpRange;
 
