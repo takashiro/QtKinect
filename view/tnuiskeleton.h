@@ -1,19 +1,19 @@
-#ifndef TNUIMOUSE_H
-#define TNUIMOUSE_H
+#ifndef TNUISKELETON_H
+#define TNUISKELETON_H
 
 #include <QQuickItem>
 
 class TNuiTracker;
 
-class TNuiTrackerItem : public QQuickItem
+class TNuiSkeleton : public QQuickItem
 {
     Q_OBJECT
 
     Q_PROPERTY(QString target READ target WRITE setTarget NOTIFY targetChanged)
 
 public:
-    TNuiTrackerItem(QQuickItem *parent = 0);
-    ~TNuiTrackerItem();
+    TNuiSkeleton(QQuickItem *parent = 0);
+    ~TNuiSkeleton();
 
     QString target() const;
     void setTarget(const QString &target);
@@ -25,4 +25,4 @@ private:
     TNuiTracker *m_tracker;
 };
 
-#endif // TNUIMOUSE_H
+#endif // TNUISKELETON_H

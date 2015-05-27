@@ -24,7 +24,7 @@ INCLUDEPATH += $$PWD
 SOURCES += \
     $$PWD/view/tnuicolorcamera.cpp \
     $$PWD/view/tnuihandarea.cpp \
-    $$PWD/view/tnuitrackeritem.cpp \
+    $$PWD/view/tnuiskeleton.cpp \
     $$PWD/kinectglobal.cpp \
     $$PWD/tnuicolorstreameffect.cpp \
     $$PWD/tnuicolorstream.cpp \
@@ -40,7 +40,7 @@ SOURCES += \
 HEADERS += \
     $$PWD/view/tnuicolorcamera.h \
     $$PWD/view/tnuihandarea.h \
-    $$PWD/view/tnuitrackeritem.h \
+    $$PWD/view/tnuiskeleton.h \
     $$PWD/kinectglobal.h \
     $$PWD/tnuicolorstreameffect.h \
     $$PWD/tnuicolorstream.h \

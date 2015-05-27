@@ -1,4 +1,4 @@
-#include "tnuitrackeritem.h"
+#include "tnuiskeleton.h"
 
 #include "tnuisensormanager.h"
 #include "tnuitracker.h"
@@ -26,20 +26,20 @@ const char *TargetEnum[] = {
     "foot_right"
 };
 
-TNuiTrackerItem::TNuiTrackerItem(QQuickItem *parent)
+TNuiSkeleton::TNuiSkeleton(QQuickItem *parent)
     : QQuickItem(parent)
 {
     TNuiSensor *sensor = SensorManager->sensor();
 
     m_tracker = new TNuiTracker(sensor);
-    connect(m_tracker, &TNuiTracker::moved, this, &TNuiTrackerItem::setPosition);
+    connect(m_tracker, &TNuiTracker::moved, this, &TNuiSkeleton::setPosition);
 }
 
-TNuiTrackerItem::~TNuiTrackerItem()
+TNuiSkeleton::~TNuiSkeleton()
 {
 }
 
-QString TNuiTrackerItem::target() const
+QString TNuiSkeleton::target() const
 {
     NUI_SKELETON_POSITION_INDEX index = m_tracker->target();
     if (index >= 0 && index <= NUI_SKELETON_POSITION_COUNT)
@@ -47,7 +47,7 @@ QString TNuiTrackerItem::target() const
     return QString();
 }
 
-void TNuiTrackerItem::setTarget(const QString &target)
+void TNuiSkeleton::setTarget(const QString &target)
 {
     for (int i = 0; i < NUI_SKELETON_POSITION_COUNT; i++) {
         if (target == TargetEnum[i]) {
