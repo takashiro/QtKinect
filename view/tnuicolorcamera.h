@@ -2,7 +2,6 @@
 #define TNUICOLORCAMERA_H
 
 #include <QQuickItem>
-#include <QImage>
 
 class TNuiColorStream;
 class QSGTexture;
@@ -25,12 +24,10 @@ signals:
     void backgroundRemovedChanged();
 
 protected:
-    void updateFrame();
     QSGNode *updatePaintNode(QSGNode *node, UpdatePaintNodeData *);
 
     TNuiColorStream *m_stream;
-    QImage m_image;
-    QSGTexture *m_texture;
+    QMutex m_textureMutex;
     TNuiBackgroundRemovalEffect *m_backgroundRemovalEffect;
 };
 

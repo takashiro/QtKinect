@@ -11,7 +11,6 @@
 
 TNuiColorCamera::TNuiColorCamera(QQuickItem *parent)
     : QQuickItem(parent)
-    , m_texture(nullptr)
     , m_backgroundRemovalEffect(nullptr)
 {
     setFlag(ItemHasContents, true);
@@ -19,14 +18,14 @@ TNuiColorCamera::TNuiColorCamera(QQuickItem *parent)
     TNuiSensor *sensor = SensorManager->sensor();
     if (sensor != nullptr) {
         m_stream = new TNuiColorStream(sensor);
-        connect(m_stream, &TNuiColorStream::readyRead, this, &TNuiColorCamera::updateFrame);
+        connect(m_stream, &TNuiColorStream::readyRead, this, &TNuiColorCamera::update);
         m_stream->tryOpen();
     }
 }
 
 TNuiColorCamera::~TNuiColorCamera()
 {
-    delete m_texture;
+    delete m_backgroundRemovalEffect;
 }
 
 bool TNuiColorCamera::backgroundRemoved() const
@@ -52,26 +51,19 @@ void TNuiColorCamera::setBackgroundRemoved(bool removed)
 #endif
 }
 
-void TNuiColorCamera::updateFrame()
-{
-    m_image = m_stream->readImage();
-    QQuickWindow *mainWindow = window();
-    if (mainWindow) {
-        delete m_texture;
-        m_texture = mainWindow->createTextureFromImage(m_image);
-        update();
-    }
-}
-
 QSGNode *TNuiColorCamera::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
 {
-    if (m_texture == nullptr)
-        return node;
-
     QSGSimpleTextureNode *textureNode = static_cast<QSGSimpleTextureNode *>(node);
-    if (!textureNode)
+    if (!textureNode) {
         textureNode = new QSGSimpleTextureNode;
+        textureNode->setOwnsTexture(true);
+    }
+
+    QQuickWindow *mainWindow = window();
+    QImage image(m_stream->readImage());
+    QSGTexture *texture = mainWindow->createTextureFromImage(image);
     textureNode->setRect(boundingRect());
-    textureNode->setTexture(m_texture);
+    textureNode->setTexture(texture);
+
     return textureNode;
 }
