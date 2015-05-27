@@ -14,7 +14,6 @@ class TNuiSensorManager : public QObject
     Q_OBJECT
 
 public:
-    static void CALLBACK ChangeStatusCallback(HRESULT, const OLECHAR *winInstanceName, const OLECHAR *, void *userData);
     static TNuiSensorManager *instance();
 
     ~TNuiSensorManager();
@@ -26,8 +25,8 @@ signals:
 private:
     TNuiSensorManager(QObject *parent = 0);
 
-protected:
     TNuiSensor *_addSensor(INuiSensor *sensor);
+    static void CALLBACK ChangeStatusCallback(HRESULT, const OLECHAR *winInstanceName, const OLECHAR *, void *userData);
 
     QList<TNuiSensor *> m_sensors;
 };
