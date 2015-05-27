@@ -42,7 +42,7 @@ TNuiSkeleton::~TNuiSkeleton()
 QString TNuiSkeleton::target() const
 {
     NUI_SKELETON_POSITION_INDEX index = m_tracker->target();
-    if (index >= 0 && index <= NUI_SKELETON_POSITION_COUNT)
+    if (index >= 0 && index < NUI_SKELETON_POSITION_COUNT)
         return TargetEnum[index];
     return QString();
 }
