@@ -13,6 +13,8 @@ class TNuiSensor : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(QString state READ stateString NOTIFY stateChanged)
+
 public:
     friend class TNuiSensorManager;
 
@@ -64,7 +66,8 @@ public:
     uint initFlags() const {return m_sensor->NuiInitializationFlags();}
 
     //Gets the connection status of the Kinect sensor.
-    State state() {return m_state;}
+    State state() const {return m_state;}
+    QString stateString() const;
 
     //Gets the zero-based sensor index.
     int instanceIndex() const {return m_sensor->NuiInstanceIndex();}

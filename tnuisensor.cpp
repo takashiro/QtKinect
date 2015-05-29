@@ -56,3 +56,27 @@ void TNuiSensor::updateState()
     else if (m_state == ConnectedState)
         emit connected();
 }
+
+QString TNuiSensor::stateString() const
+{
+    switch (m_state) {
+    case TNuiSensor::ConnectedState:
+        return "connected";
+    case TNuiSensor::InitializingState:
+        return "initializing";
+    case TNuiSensor::NotConnectedState:
+        return "not_connected";
+    case TNuiSensor::NotGenuine:
+        return "invalid";
+    case TNuiSensor::NotSupportedState:
+        return "not_supported";
+    case TNuiSensor::InsufficientBandwidthState:
+        return "insufficient_bandwidth";
+    case TNuiSensor::NotPoweredState:
+        return "unpowered";
+    case TNuiSensor::NotReadyState:
+        return "not_ready";
+    default:
+        return "unkown";
+    }
+}
