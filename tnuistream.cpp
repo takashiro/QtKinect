@@ -21,10 +21,8 @@ TNuiStreamInternal::~TNuiStreamInternal()
 
 void TNuiStreamInternal::tryOpen()
 {
-    if (open()) {
-        TNuiSensor *sensor = qobject_cast<TNuiSensor *>(sender());
-        if (sensor)
-            disconnect(sensor, &TNuiSensor::connected, this, &TNuiStreamInternal::tryOpen);
+    if (m_sensor->state() == TNuiSensor::ConnectedState) {
+        open();
     }
 }
 
@@ -56,6 +54,8 @@ void TNuiStreamInternal::run()
             break;
         }
     }
+
+    m_isOpen = false;
 }
 
 TNuiStream::TNuiStream(TNuiSensor *sensor)

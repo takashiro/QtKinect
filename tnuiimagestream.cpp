@@ -24,21 +24,20 @@ TNuiImageStreamInternal::~TNuiImageStreamInternal()
 
 bool TNuiImageStreamInternal::open()
 {
-    if (m_isOpen)
-        return true;
-
     INuiSensor *sensor = m_sensor->nativeSensor();
     m_frameReadyEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-    m_isOpen = (S_OK == sensor->NuiImageStreamOpen(
+    HRESULT hr = sensor->NuiImageStreamOpen(
                     (NUI_IMAGE_TYPE) m_type,
                     (NUI_IMAGE_RESOLUTION) m_resolution,
                     m_flags,
                     m_frameBufferSize,
                     m_frameReadyEvent,
-                    &m_streamHandle));
+                    &m_streamHandle);
 
-    if (m_isOpen)
+    if (hr == S_OK) {
+        m_isOpen = true;
         start();
+    }
 
     return m_isOpen;
 }
