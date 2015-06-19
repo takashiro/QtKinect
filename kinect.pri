@@ -35,7 +35,9 @@ SOURCES += \
     $$PWD/tnuiskeletonstream.cpp \
     $$PWD/tnuistream.cpp \
     $$PWD/tnuitracker.cpp \
-    $$PWD/windowsutil.cpp
+    $$PWD/windowsutil.cpp \
+    $$PWD/tnuigripgesture.cpp \
+    $$PWD/tnuigesture.cpp
 
 HEADERS += \
     $$PWD/view/tnuicolorcamera.h \
@@ -51,7 +53,9 @@ HEADERS += \
     $$PWD/tnuiskeletonstream.h \
     $$PWD/tnuistream.h \
     $$PWD/tnuitracker.h \
-    $$PWD/windowsutil.h
+    $$PWD/windowsutil.h \
+    $$PWD/tnuigripgesture.h \
+    $$PWD/tnuigesture.h
 
 contains(KINECT_LIB, KinectBackgroundRemoval){
     DEFINES += KINECT_USE_BACKGROUNDREMOVAL

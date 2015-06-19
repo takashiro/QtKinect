@@ -32,11 +32,11 @@ bool TNuiSkeletonStreamInternal::close()
 
 bool TNuiSkeletonStreamInternal::processNewFrame()
 {
-   // Attempt to get the color frame
-   frameMutex.lockForWrite();
-   bool isValid = (S_OK == m_sensor->nativeSensor()->NuiSkeletonGetNextFrame(0, &frame));
-   frameMutex.unlock();
-   return isValid;
+    // Attempt to get the color frame
+    frameMutex.lockForWrite();
+    bool isValid = (S_OK == m_sensor->nativeSensor()->NuiSkeletonGetNextFrame(0, &frame));
+    frameMutex.unlock();
+    return isValid;
 }
 
 QPointer<TNuiSkeletonStreamInternal> TNuiSkeletonStream::d = nullptr;
