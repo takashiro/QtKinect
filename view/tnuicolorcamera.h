@@ -29,6 +29,7 @@ protected:
     TNuiColorStream *m_stream;
     QMutex m_textureMutex;
     TNuiBackgroundRemovalEffect *m_backgroundRemovalEffect;
+    QSGTexture *m_texture;
 };
 
 #endif // TNUICOLORCAMERA_H

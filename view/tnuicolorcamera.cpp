@@ -12,6 +12,7 @@
 TNuiColorCamera::TNuiColorCamera(QQuickItem *parent)
     : QQuickItem(parent)
     , m_backgroundRemovalEffect(nullptr)
+    , m_texture(nullptr)
 {
     setFlag(ItemHasContents, true);
 
@@ -53,17 +54,21 @@ void TNuiColorCamera::setBackgroundRemoved(bool removed)
 
 QSGNode *TNuiColorCamera::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
 {
-    QSGSimpleTextureNode *textureNode = static_cast<QSGSimpleTextureNode *>(node);
-    if (!textureNode) {
-        textureNode = new QSGSimpleTextureNode;
-        textureNode->setOwnsTexture(true);
-    }
-
     QQuickWindow *mainWindow = window();
+    if (!mainWindow)
+        return node;
+
+    QSGSimpleTextureNode *textureNode = static_cast<QSGSimpleTextureNode *>(node);
+    if (!textureNode)
+        textureNode = new QSGSimpleTextureNode;
+
+    if (m_texture)
+        m_texture->deleteLater();
+
     QImage image(m_stream->readImage());
-    QSGTexture *texture = mainWindow->createTextureFromImage(image);
+    m_texture = mainWindow->createTextureFromImage(image);
+    textureNode->setTexture(m_texture);
     textureNode->setRect(boundingRect());
-    textureNode->setTexture(texture);
 
     return textureNode;
 }
