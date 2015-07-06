@@ -32,7 +32,8 @@ TNuiSkeleton::TNuiSkeleton(QQuickItem *parent)
     TNuiSensor *sensor = SensorManager->sensor();
 
     m_tracker = new TNuiTracker(sensor);
-    connect(m_tracker, &TNuiTracker::moved, this, &TNuiSkeleton::setPosition);
+    connect(m_tracker, &TNuiTracker::screenPosChanged, this, &TNuiSkeleton::setPosition);
+    connect(m_tracker, &TNuiTracker::realPosChanged, this, &TNuiSkeleton::setRealPos);
 }
 
 TNuiSkeleton::~TNuiSkeleton()
@@ -52,8 +53,14 @@ void TNuiSkeleton::setTarget(const QString &target)
     for (int i = 0; i < NUI_SKELETON_POSITION_COUNT; i++) {
         if (target == TargetEnum[i]) {
             m_tracker->setTarget(NUI_SKELETON_POSITION_INDEX(i));
-            emit targetChanged(target);
+            emit targetChanged();
             break;
         }
     }
+}
+
+void TNuiSkeleton::setRealPos(const QVector3D &pos)
+{
+    m_realPos = pos;
+    emit realPosChanged();
 }

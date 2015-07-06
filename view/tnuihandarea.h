@@ -41,7 +41,7 @@ protected:
     void onLeftHandMoved(const QPointF &pos);
     void onRightHandMoved(const QPointF &pos);
     void onHandMoved(bool &isUnderHand, const QPointF &pos);
-    void onTrackerZChanged(float z);
+    void onTrackerPosChanged(const QVector3D &pos);
 
 signals:
     void entered();

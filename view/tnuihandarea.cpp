@@ -21,10 +21,10 @@ TNuiHandArea::TNuiHandArea(QQuickItem *parent)
     TNuiSensor *sensor = SensorManager->sensor();
 
     static TNuiTracker *leftTracker = m_leftTracker = new TNuiTracker(sensor, NUI_SKELETON_POSITION_HAND_LEFT);
-    connect(leftTracker, &TNuiTracker::moved, this, &TNuiHandArea::onLeftHandMoved);
+    connect(leftTracker, &TNuiTracker::screenPosChanged, this, &TNuiHandArea::onLeftHandMoved);
 
     static TNuiTracker *rightTracker = m_rightTracker = new TNuiTracker(sensor, NUI_SKELETON_POSITION_HAND_RIGHT);
-    connect(rightTracker, &TNuiTracker::moved, this, &TNuiHandArea::onRightHandMoved);
+    connect(rightTracker, &TNuiTracker::screenPosChanged, this, &TNuiHandArea::onRightHandMoved);
 
     connect(this, &TNuiHandArea::exited, this, &TNuiHandArea::resetState);
 
@@ -66,34 +66,34 @@ void TNuiHandArea::onHandMoved(bool &isUnderHand, const QPointF &pos)
             isUnderHand = true;
             if (m_isUnderLeftHand) {
                 m_initialHandZ =  m_leftTracker->z();
-                connect(m_leftTracker, &TNuiTracker::zChanged, this, &TNuiHandArea::onTrackerZChanged);
+                connect(m_leftTracker, &TNuiTracker::realPosChanged, this, &TNuiHandArea::onTrackerPosChanged);
             } else {
                 m_initialHandZ =  m_rightTracker->z();
-                connect(m_rightTracker, &TNuiTracker::zChanged, this, &TNuiHandArea::onTrackerZChanged);
+                connect(m_rightTracker, &TNuiTracker::realPosChanged, this, &TNuiHandArea::onTrackerPosChanged);
             }
             emit entered();
         }
     } else {
         if (isUnderHand) {
-            disconnect(m_leftTracker, &TNuiTracker::zChanged, this, &TNuiHandArea::onTrackerZChanged);
-            disconnect(m_rightTracker, &TNuiTracker::zChanged, this, &TNuiHandArea::onTrackerZChanged);
+            disconnect(m_leftTracker, &TNuiTracker::realPosChanged, this, &TNuiHandArea::onTrackerPosChanged);
+            disconnect(m_rightTracker, &TNuiTracker::realPosChanged, this, &TNuiHandArea::onTrackerPosChanged);
             isUnderHand = false;
             emit exited();
         }
     }
 }
 
-void TNuiHandArea::onTrackerZChanged(float z)
+void TNuiHandArea::onTrackerPosChanged(const QVector3D &pos)
 {
-    m_handZ = z;
+    m_handZ = pos.z();
     emit handZChanged();
     if (m_isPressed) {
-        if (m_initialHandZ - z < m_pressUpRange) {
+        if (m_initialHandZ - m_handZ < m_pressUpRange) {
             m_isPressed = false;
             emit pressUp();
         }
     } else {
-        if (m_initialHandZ - z > m_pressDownRange) {
+        if (m_initialHandZ - m_handZ > m_pressDownRange) {
             m_isPressed = true;
             emit pressDown();
         }

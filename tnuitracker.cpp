@@ -46,10 +46,15 @@ void TNuiTracker::handleNewFrame()
     for (int i = 0; i < NUI_SKELETON_COUNT; i++) {
         if (frame.SkeletonData[i].dwTrackingID != 0) {
             const Vector4 &pos3d = frame.SkeletonData[i].SkeletonPositions[m_target];
+
             m_screenPos = MapToScreen(pos3d);
-            emit moved(m_screenPos);
-            m_z = pos3d.z;
-            emit zChanged(m_z);
+            emit screenPosChanged(m_screenPos);
+
+            m_realPos.setX(pos3d.x);
+            m_realPos.setY(pos3d.y);
+            m_realPos.setZ(pos3d.z);
+            emit realPosChanged(m_realPos);
+
             break;
         }
     }
